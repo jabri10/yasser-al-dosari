@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Surah Details</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f4f4f4;
+    }
+    #app {
+      max-width: 800px;
+      margin: auto;
+      padding: 20px;
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+    #verse {
+      margin: 20px 0;
+      font-size: 18px;
+      line-height: 1.5;
+    }
+    #translation {
+      font-style: italic;
+      color: #555;
+      margin-bottom: 20px;
+    }
+    #audio {
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <h1>Surah Details</h1>
+    <div id="verse">
+      <h3>Verse:</h3>
+      <p id="verse-text">Loading...</p>
+    </div>
+    
+    <div id="translation">
+      <h3>Translation:</h3>
+      <p id="translation-text">Loading...</p>
+    </div>
+
+    <div id="audio">
+      <button onclick="playAudio()">Play Recitation</button>
+    </div>
+  </div>
+
+  <script>
+    const apiBaseUrl = 'https://api.alquran.cloud/v1';
+    const urlParams = new URLSearchParams(window.location.search);
+    const surahNumber = urlParams.get('number');
+
+    // Fetch the Surah details based on the Surah number
+    async function loadSurahDetails() {
+      try {
+        const response = await fetch(`${apiBaseUrl}/surah/${surahNumber}`);
+        const data = await response.json();
+
+        const verseText = document.getElementById('verse-text');
+        const translationText = document.getElementById('translation-text');
+        const audioButton = document.getElementById('audio').querySelector('button');
+
+        // Display the first verse (for simplicity)
+        const verse = data.data.ayahs[0];
+        verseText.textContent = verse.text;
+        translationText.textContent = 'Loading translation...';
+
+        // Fetch English translation
+        const translationResponse = await fetch(`${apiBaseUrl}/surah/${surahNumber}/en.asad`);
+        const translationData = await translationResponse.json();
+        translationText.textContent = translationData.data[0].text;
+
+        // Set up audio for the recitation
+        audioButton.onclick = () => playAudio(verse.numberInSurah);
+      } catch (error) {
+        console.error('Error loading Surah details:', error);
+      }
+    }
+
+    // Play audio for the given verse number
+    function playAudio(verseNumber = 1) {
+      const audioUrl = `https://verses.quran.com/audio/recitations/Abu_Bakr_al_Siddiq/${verseNumber}.mp3`;
+      const audio = new Audio(audioUrl);
+      audio.play();
+    }
+
+    // Load Surah details on page load
+    window.onload = loadSurahDetails;
+  </script>
+</body>
+</html>
