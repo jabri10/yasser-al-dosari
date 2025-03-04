@@ -1,208 +1,44 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Quran App</title>
+  <title>Fetch Surah</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 0;
-      background-color: #f4f4f4;
+      font-family: sans-serif;
+      text-align: center;
     }
-    #app {
-      max-width: 800px;
-      margin: auto;
-      padding: 20px;
-      background-color: white;
-      border-radius: 8px;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    }
-    #surah-list {
-      margin-bottom: 20px;
-    }
-    #surah-list li {
-      cursor: pointer;
-      padding: 10px;
-      background-color: #2a9d8f;
-      color: white;
-      border: 1px solid #ccc;
-      margin-bottom: 5px;
-      border-radius: 5px;
-      transition: background-color 0.3s;
-    }
-    #surah-list li:hover {
-      background-color: #e76f51;
-    }
-    #verse {
-      margin: 20px 0;
-      font-size: 18px;
-      line-height: 1.5;
-    }
-    #translation {
-      font-style: italic;
-      color: #555;
-      margin-bottom: 20px;
-    }
-    #audio {
-      margin-top: 20px;
-    }
-    #verse-navigation {
+    #surahDisplay {
       margin-top: 20px;
     }
   </style>
 </head>
 <body>
-  <div id="app">
-    <h1>Simple Quran App</h1>
-    <h3>Select Surah</h3>
-    <ul id="surah-list">
-      <!-- Surah list will be populated here -->
-    </ul>
-
-    <div id="verse">
-      <h3>Verse (Arabic):</h3>
-      <p id="verse-text">Please select a Surah and Verse.</p>
-    </div>
-    
-    <div id="translation">
-      <h3>Translation:</h3>
-      <p id="translation-text">Translation will appear here.</p>
-    </div>
-
-    <div id="reciter-select">
-      <h3>Select Reciter:</h3>
-      <select id="reciter">
-        <option value="yasser_al_dosari">Yasser Al-Dosari</option>
-        <option value="abdurrahman_al_sudais">Abdurrahman Al-Sudais</option>
-        <option value="mahmood_ali_al_banna">Mahmood Ali Al-Banna</option>
-      </select>
-    </div>
-
-    <div id="audio">
-      <button onclick="playAudio()">Play Recitation</button>
-    </div>
-
-    <div id="verse-navigation">
-      <button onclick="prevVerse()">Previous Verse</button>
-      <button onclick="nextVerse()">Next Verse</button>
-    </div>
-  </div>
+  <h1>Quran Surah Fetcher</h1>
+  <label for="surahNumber">Enter Surah Number (1-114):</label>
+  <input type="number" id="surahNumber" min="1" max="114">
+  <button onclick="fetchSurah()">Fetch Surah</button>
+  <div id="surahDisplay"></div>
 
   <script>
-    const apiBaseUrl = 'https://api.alquran.cloud/v1';
-    let currentSurah = null;
-    let currentVerseIndex = 0;
-    let surahData = null;
-
-    // Fetch and display the Surah list
-    async function loadSurahs() {
-      try {
-        const response = await fetch(`${apiBaseUrl}/surah`);
-        const data = await response.json();
-        const surahList = document.getElementById('surah-list');
-        data.data.forEach(surah => {
-          const li = document.createElement('li');
-          li.innerHTML = `${surah.number}. ${surah.name}`;
-          li.onclick = () => loadSurahDetails(surah.number);  // Call loadSurahDetails for the clicked Surah
-          surahList.appendChild(li);
-        });
-      } catch (error) {
-        console.error('Error loading Surahs:', error);
-      }
-    }
-
-    // Fetch Surah details and display all verses
-    async function loadSurahDetails(surahNumber) {
-      try {
-        const response = await fetch(`${apiBaseUrl}/surah/${surahNumber}`);
-        const data = await response.json();
-        
-        // Store the Surah data
-        surahData = data.data;
-
-        // Set the Surah name
-        currentSurah = surahNumber;
-
-        // Reset verse index
-        currentVerseIndex = 0;
-
-        // Display the first verse
-        displayVerse(currentVerseIndex);
-      } catch (error) {
-        console.error('Error loading Surah details:', error);
-      }
-    }
-
-    // Display the current verse and its translation
-    async function displayVerse(verseIndex) {
-      if (!surahData) return;
-
-      const verse = surahData.ayahs[verseIndex];
-      const verseText = document.getElementById('verse-text');
-      const translationText = document.getElementById('translation-text');
-      const audioButton = document.getElementById('audio').querySelector('button');
-
-      // Display Arabic verse text
-      verseText.textContent = verse.text;
-
-      // Fetch and display translation (using `en.asad`)
-      const translationResponse = await fetch(`${apiBaseUrl}/surah/${currentSurah}/en.asad`);
-      const translationData = await translationResponse.json();
-      if (translationData.data && translationData.data[verseIndex]) {
-        translationText.textContent = translationData.data[verseIndex].text;
+    function fetchSurah() {
+      const surahNum = document.getElementById("surahNumber").value;
+      if (surahNum >= 1 && surahNum <= 114) {
+        fetch(`https://api.alquran.cloud/v1/surah/${surahNum}/en.asad`)
+          .then(response => response.json())
+          .then(data => {
+            let surahHtml = `<h2>Surah ${data.data.number}: ${data.data.englishName}</h2>`;
+            data.data.ayahs.forEach(ayah => {
+              surahHtml += `<p>${ayah.text}</p><p>${ayah.translation}</p><hr>`;
+            });
+            document.getElementById("surahDisplay").innerHTML = surahHtml;
+          })
+          .catch(error => {
+            document.getElementById("surahDisplay").innerHTML = `<p>Error fetching surah: ${error}</p>`;
+          });
       } else {
-        translationText.textContent = 'Translation not available.';
-      }
-
-      // Set up audio for the recitation of the current verse
-      audioButton.onclick = () => playAudio(verse.numberInSurah);
-    }
-
-    // Play audio for the given verse number and reciter
-    function playAudio(verseNumber = 1) {
-      const reciter = document.getElementById('reciter').value;
-
-      // URL format for reciter-specific audio
-      let recitationUrl;
-      switch (reciter) {
-        case 'yasser_al_dosari':
-          recitationUrl = `https://verses.quran.com/audio/recitations/Yasser_Al_Dosari/${verseNumber}.mp3`;
-          break;
-        case 'abdurrahman_al_sudais':
-          recitationUrl = `https://verses.quran.com/audio/recitations/Abdurrahman_Al_Sudais/${verseNumber}.mp3`;
-          break;
-        case 'mahmood_ali_al_banna':
-          recitationUrl = `https://verses.quran.com/audio/recitations/Mahmood_Ali_Al_Banna/${verseNumber}.mp3`;
-          break;
-        default:
-          recitationUrl = `https://verses.quran.com/audio/recitations/Yasser_Al_Dosari/${verseNumber}.mp3`;
-          break;
-      }
-
-      const audio = new Audio(recitationUrl);
-      audio.play();
-    }
-
-    // Navigate to the previous verse
-    function prevVerse() {
-      if (currentVerseIndex > 0) {
-        currentVerseIndex--;
-        displayVerse(currentVerseIndex);
+        document.getElementById("surahDisplay").innerHTML = "<p>Please enter a valid surah number (1-114).</p>";
       }
     }
-
-    // Navigate to the next verse
-    function nextVerse() {
-      if (currentVerseIndex < surahData.ayahs.length - 1) {
-        currentVerseIndex++;
-        displayVerse(currentVerseIndex);
-      }
-    }
-
-    // Load Surahs when the page is loaded
-    window.onload = loadSurahs;
   </script>
 </body>
 </html>
