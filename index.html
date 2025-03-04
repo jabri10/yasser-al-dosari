@@ -39,9 +39,9 @@
 
     // Add a sphere to represent the Earth
     const geometry = new THREE.SphereGeometry(3, 50, 50);
+    const texture = new THREE.TextureLoader().load('https://upload.wikimedia.org/wikipedia/commons/9/9f/Earth_PNG42.png'); // Earth texture
     const material = new THREE.MeshBasicMaterial({
-      color: 0xaaaaaa,
-      wireframe: true
+      map: texture,
     });
     const earth = new THREE.Mesh(geometry, material);
     scene.add(earth);
@@ -68,11 +68,8 @@
       });
     }
 
-    // Create a texture for each country (you can add country borders or flags)
+    // Create a marker for each country
     async function createCountryMarkers() {
-      // This example doesn't include actual country polygons, but we could use 
-      // a projection of country borders or locations from a geoJSON file.
-      // For simplicity, we'll add a few sample markers.
       const markerGeometry = new THREE.SphereGeometry(0.05, 16, 16);
       const markerMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000 });
 
@@ -146,6 +143,5 @@
   </script>
 </body>
 </html>
-
 
 
