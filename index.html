@@ -59,13 +59,22 @@
     </ul>
 
     <div id="verse">
-      <h3>Verse:</h3>
+      <h3>Verse (Arabic):</h3>
       <p id="verse-text">Please select a Surah and Verse.</p>
     </div>
     
     <div id="translation">
       <h3>Translation:</h3>
       <p id="translation-text">Translation will appear here.</p>
+    </div>
+
+    <div id="reciter-select">
+      <h3>Select Reciter:</h3>
+      <select id="reciter">
+        <option value="yasser_al_dosari">Yasser Al-Dosari</option>
+        <option value="abdurrahman_al_sudais">Abdurrahman Al-Sudais</option>
+        <option value="mahmood_ali_al_banna">Mahmood Ali Al-Banna</option>
+      </select>
     </div>
 
     <div id="audio">
@@ -84,7 +93,8 @@
         const surahList = document.getElementById('surah-list');
         data.data.forEach(surah => {
           const li = document.createElement('li');
-          li.innerHTML = `<a href="surah.html?number=${surah.number}">${surah.number}. ${surah.name}</a>`;
+          li.innerHTML = `${surah.number}. ${surah.name}`;
+          li.onclick = () => loadSurahDetails(surah.number);  // Call loadSurahDetails for the clicked Surah
           surahList.appendChild(li);
         });
       } catch (error) {
@@ -92,10 +102,54 @@
       }
     }
 
-    // Play audio for the given verse number
+    // Fetch Surah details and display the first verse's Arabic text and translation
+    async function loadSurahDetails(surahNumber) {
+      try {
+        const response = await fetch(`${apiBaseUrl}/surah/${surahNumber}`);
+        const data = await response.json();
+        
+        const verseText = document.getElementById('verse-text');
+        const translationText = document.getElementById('translation-text');
+        const audioButton = document.getElementById('audio').querySelector('button');
+
+        // Display the first verse (for simplicity)
+        const verse = data.data.ayahs[0];  // Get the first verse of the Surah
+        verseText.textContent = verse.text;  // Display Arabic text
+
+        // Fetch English translation
+        const translationResponse = await fetch(`${apiBaseUrl}/surah/${surahNumber}/en.asad`);
+        const translationData = await translationResponse.json();
+        translationText.textContent = translationData.data[0].text; // Display the translation of the first verse
+
+        // Set up audio for the recitation
+        audioButton.onclick = () => playAudio(verse.numberInSurah);  // Play recitation for this verse
+      } catch (error) {
+        console.error('Error loading Surah details:', error);
+      }
+    }
+
+    // Play audio for the given verse number and reciter
     function playAudio(verseNumber = 1) {
-      const audioUrl = `https://verses.quran.com/audio/recitations/Abu_Bakr_al_Siddiq/${verseNumber}.mp3`;
-      const audio = new Audio(audioUrl);
+      const reciter = document.getElementById('reciter').value;
+
+      // URL format for reciter-specific audio
+      let recitationUrl;
+      switch (reciter) {
+        case 'yasser_al_dosari':
+          recitationUrl = `https://verses.quran.com/audio/recitations/Yasser_Al_Dosari/${verseNumber}.mp3`;
+          break;
+        case 'abdurrahman_al_sudais':
+          recitationUrl = `https://verses.quran.com/audio/recitations/Abdurrahman_Al_Sudais/${verseNumber}.mp3`;
+          break;
+        case 'mahmood_ali_al_banna':
+          recitationUrl = `https://verses.quran.com/audio/recitations/Mahmood_Ali_Al_Banna/${verseNumber}.mp3`;
+          break;
+        default:
+          recitationUrl = `https://verses.quran.com/audio/recitations/Yasser_Al_Dosari/${verseNumber}.mp3`;
+          break;
+      }
+
+      const audio = new Audio(recitationUrl);
       audio.play();
     }
 
@@ -104,7 +158,3 @@
   </script>
 </body>
 </html>
-
-
-
-
