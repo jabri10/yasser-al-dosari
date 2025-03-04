@@ -81,12 +81,10 @@
 
     <!-- Character Setup -->
     <div class="character-info" id="char1-info">
-      <input type="text" id="char1-name" placeholder="Enter Character 1 Name">
       <button class="btn" onclick="createCharacter(1)">Create Character 1</button>
     </div>
     
     <div class="character-info" id="char2-info">
-      <input type="text" id="char2-name" placeholder="Enter Character 2 Name">
       <button class="btn" onclick="createCharacter(2)">Create Character 2</button>
     </div>
 
@@ -107,43 +105,47 @@
   <script>
     // Modest Clothing Options for Male Characters
     const clothingOptions = ["Long Robe", "Jubba", "Shalwar Kameez", "Thobe"];
-    const characterImages = [
-      "https://via.placeholder.com/100?text=Ali", // Image for Character 1
-      "https://via.placeholder.com/100?text=Ahmed" // Image for Character 2
-    ];
-
     let character1 = null;
     let character2 = null;
 
-    function createCharacter(characterNum) {
-      const name = document.getElementById(`char${characterNum}-name`).value;
-      if (!name) {
-        alert('Please enter a name');
-        return;
-      }
-
-      // Assign random modest clothing
-      const clothing = clothingOptions[Math.floor(Math.random() * clothingOptions.length)];
+    // Fetch random user data from an external API
+    async function fetchRandomCharacter() {
+      const response = await fetch('https://randomuser.me/api/');
+      const data = await response.json();
+      const user = data.results[0];
       
-      // Character data with added attributes like strength and agility
-      const character = {
-        name,
-        health: 100,
+      return {
+        name: user.name.first + ' ' + user.name.last,
+        image: user.picture.large,
+        clothing: clothingOptions[Math.floor(Math.random() * clothingOptions.length)],
         strength: Math.floor(Math.random() * 15) + 5,  // Random strength between 5 and 20
         agility: Math.floor(Math.random() * 10) + 5,   // Random agility between 5 and 15
-        clothing,
-        image: characterImages[characterNum - 1]  // Choose the image for the character
+        health: 100
       };
+    }
 
-      // Store character
+    // Create character using fetched data
+    async function createCharacter(characterNum) {
+      const character = await fetchRandomCharacter();
+
       if (characterNum === 1) {
         character1 = character;
-        document.getElementById('char1-stats').innerHTML = `Name: ${character.name} <br> Health: ${character.health} <br> Strength: ${character.strength} <br> Agility: ${character.agility} <br> Clothing: ${character.clothing}`;
+        document.getElementById('char1-stats').innerHTML = `
+          Name: ${character.name} <br>
+          Health: ${character.health} <br> 
+          Strength: ${character.strength} <br> 
+          Agility: ${character.agility} <br> 
+          Clothing: ${character.clothing}`;
         document.getElementById('char1-display').innerHTML = `<img src="${character.image}" alt="${character.name}"> <br> ${character.name}`;
         document.getElementById('char1-info').style.display = 'none';
       } else {
         character2 = character;
-        document.getElementById('char2-stats').innerHTML = `Name: ${character.name} <br> Health: ${character.health} <br> Strength: ${character.strength} <br> Agility: ${character.agility} <br> Clothing: ${character.clothing}`;
+        document.getElementById('char2-stats').innerHTML = `
+          Name: ${character.name} <br> 
+          Health: ${character.health} <br> 
+          Strength: ${character.strength} <br> 
+          Agility: ${character.agility} <br> 
+          Clothing: ${character.clothing}`;
         document.getElementById('char2-display').innerHTML = `<img src="${character.image}" alt="${character.name}"> <br> ${character.name}`;
         document.getElementById('char2-info').style.display = 'none';
       }
