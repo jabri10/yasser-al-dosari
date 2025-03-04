@@ -20,7 +20,7 @@
       padding: 20px;
       border-radius: 10px;
       box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
-      width: 300px;
+      width: 400px;
       text-align: center;
     }
 
@@ -31,6 +31,23 @@
 
     .character-info {
       margin-bottom: 15px;
+    }
+
+    .character-container {
+      display: flex;
+      justify-content: space-around;
+      margin-top: 20px;
+    }
+
+    .character {
+      text-align: center;
+      width: 100px;
+    }
+
+    .character img {
+      width: 80px;
+      height: 80px;
+      border-radius: 10px;
     }
 
     .btn {
@@ -73,24 +90,31 @@
       <button class="btn" onclick="createCharacter(2)">Create Character 2</button>
     </div>
 
-    <!-- Combat Area -->
-    <div id="combat-area" style="display: none;">
-      <div class="stats" id="char1-stats"></div>
-      <div class="stats" id="char2-stats"></div>
-      <button class="btn" onclick="startCombat()">Start Combat</button>
-      <div class="result" id="combat-result"></div>
+    <!-- Character Display and Stats -->
+    <div class="character-container" id="combat-area" style="display: none;">
+      <div class="character" id="char1-display"></div>
+      <div class="character" id="char2-display"></div>
     </div>
+
+    <div id="char1-stats" class="stats"></div>
+    <div id="char2-stats" class="stats"></div>
+
+    <!-- Combat Button -->
+    <button class="btn" onclick="startCombat()" style="display: none;" id="start-combat-btn">Start Combat</button>
+    <div class="result" id="combat-result"></div>
   </div>
 
   <script>
-    // Define Modest Clothing Options for Male Characters
+    // Modest Clothing Options for Male Characters
     const clothingOptions = ["Long Robe", "Jubba", "Shalwar Kameez", "Thobe"];
+    const characterImages = [
+      "https://via.placeholder.com/100?text=Ali", // Image for Character 1
+      "https://via.placeholder.com/100?text=Ahmed" // Image for Character 2
+    ];
 
-    // Store character data
     let character1 = null;
     let character2 = null;
 
-    // Create a character object
     function createCharacter(characterNum) {
       const name = document.getElementById(`char${characterNum}-name`).value;
       if (!name) {
@@ -98,28 +122,36 @@
         return;
       }
 
+      // Assign random modest clothing
       const clothing = clothingOptions[Math.floor(Math.random() * clothingOptions.length)];
+      
+      // Character data with added attributes like strength and agility
       const character = {
         name,
         health: 100,
-        abilities: ['Attack', 'Heal'],
-        clothing
+        strength: Math.floor(Math.random() * 15) + 5,  // Random strength between 5 and 20
+        agility: Math.floor(Math.random() * 10) + 5,   // Random agility between 5 and 15
+        clothing,
+        image: characterImages[characterNum - 1]  // Choose the image for the character
       };
 
       // Store character
       if (characterNum === 1) {
         character1 = character;
-        document.getElementById('char1-stats').innerText = `${character.name} (Health: ${character.health}, Clothing: ${character.clothing})`;
+        document.getElementById('char1-stats').innerHTML = `Name: ${character.name} <br> Health: ${character.health} <br> Strength: ${character.strength} <br> Agility: ${character.agility} <br> Clothing: ${character.clothing}`;
+        document.getElementById('char1-display').innerHTML = `<img src="${character.image}" alt="${character.name}"> <br> ${character.name}`;
         document.getElementById('char1-info').style.display = 'none';
       } else {
         character2 = character;
-        document.getElementById('char2-stats').innerText = `${character.name} (Health: ${character.health}, Clothing: ${character.clothing})`;
+        document.getElementById('char2-stats').innerHTML = `Name: ${character.name} <br> Health: ${character.health} <br> Strength: ${character.strength} <br> Agility: ${character.agility} <br> Clothing: ${character.clothing}`;
+        document.getElementById('char2-display').innerHTML = `<img src="${character.image}" alt="${character.name}"> <br> ${character.name}`;
         document.getElementById('char2-info').style.display = 'none';
       }
 
-      // Show combat area after both characters are created
+      // Show combat area and start combat button when both characters are created
       if (character1 && character2) {
-        document.getElementById('combat-area').style.display = 'block';
+        document.getElementById('combat-area').style.display = 'flex';
+        document.getElementById('start-combat-btn').style.display = 'block';
       }
     }
 
@@ -147,16 +179,12 @@
 
     // Perform an attack
     function attack(attacker, defender) {
-      const damage = Math.floor(Math.random() * 20) + 10; // Random damage between 10 and 30
+      const damage = Math.floor(Math.random() * 10) + attacker.strength; // Damage based on strength
       defender.health -= damage;
 
       // Update character stats
-      document.getElementById('char1-stats').innerText = `${character1.name} (Health: ${character1.health}, Clothing: ${character1.clothing})`;
-      document.getElementById('char2-stats').innerText = `${character2.name} (Health: ${character2.health}, Clothing: ${character2.clothing})`;
-
-      if (defender.health < 0) {
-        defender.health = 0;
-      }
+      document.getElementById('char1-stats').innerHTML = `Name: ${character1.name} <br> Health: ${character1.health} <br> Strength: ${character1.strength} <br> Agility: ${character1.agility} <br> Clothing: ${character1.clothing}`;
+      document.getElementById('char2-stats').innerHTML = `Name: ${character2.name} <br> Health: ${character2.health} <br> Strength: ${character2.strength} <br> Agility: ${character2.agility} <br> Clothing: ${character2.clothing}`;
 
       // Display attack result
       alert(`${attacker.name} attacks ${defender.name} for ${damage} damage!`);
@@ -164,4 +192,5 @@
   </script>
 </body>
 </html>
+
 
