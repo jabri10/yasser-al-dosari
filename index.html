@@ -1,133 +1,167 @@
-import random
-import sqlite3
-import time
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Combat Game - Modest Clothing</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f9;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
 
-# ============================
-# Database Setup (SQLite)
-# ============================
+    .game-container {
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+      width: 300px;
+      text-align: center;
+    }
 
-def create_database():
-    """Create the database and table if they don't exist."""
-    conn = sqlite3.connect('game_data.db')
-    cursor = conn.cursor()
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS characters (
-            id INTEGER PRIMARY KEY,
-            name TEXT NOT NULL,
-            health INTEGER,
-            abilities TEXT,
-            clothing TEXT
-        )
-    ''')
-    conn.commit()
-    conn.close()
+    .game-container h1 {
+      font-size: 24px;
+      margin-bottom: 20px;
+    }
 
-def save_character_to_db(name, health, abilities, clothing):
-    """Save a new character's data into the database."""
-    conn = sqlite3.connect('game_data.db')
-    cursor = conn.cursor()
-    cursor.execute('''
-        INSERT INTO characters (name, health, abilities, clothing) 
-        VALUES (?, ?, ?, ?)
-    ''', (name, health, str(abilities), clothing))
-    conn.commit()
-    conn.close()
+    .character-info {
+      margin-bottom: 15px;
+    }
 
-# ============================
-# Character Class
-# ============================
+    .btn {
+      background-color: #4CAF50;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      cursor: pointer;
+      border-radius: 5px;
+      font-size: 16px;
+    }
 
-class Character:
-    def __init__(self, name, health, abilities, clothing):
-        self.name = name
-        self.health = health
-        self.abilities = abilities
-        self.clothing = clothing  # Modest clothing attribute
+    .btn:hover {
+      background-color: #45a049;
+    }
 
-    def take_damage(self, damage):
-        """Reduce health when taking damage."""
-        self.health -= damage
-        if self.health < 0:
-            self.health = 0
-        print(f"{self.name} took {damage} damage, remaining health: {self.health}")
+    .result {
+      margin-top: 20px;
+      font-weight: bold;
+    }
 
-    def heal(self, heal_amount):
-        """Heal the character."""
-        self.health += heal_amount
-        print(f"{self.name} healed for {heal_amount}, current health: {self.health}")
+    .stats {
+      margin: 10px 0;
+      font-size: 16px;
+    }
+  </style>
+</head>
+<body>
+  <div class="game-container">
+    <h1>Combat Game - Modest Clothing</h1>
 
-    def attack(self, target):
-        """Attack the target with random damage."""
-        damage = random.randint(10, 20)
-        print(f"{self.name} attacks {target.name}!")
-        target.take_damage(damage)
+    <!-- Character Setup -->
+    <div class="character-info" id="char1-info">
+      <input type="text" id="char1-name" placeholder="Enter Character 1 Name">
+      <button class="btn" onclick="createCharacter(1)">Create Character 1</button>
+    </div>
+    
+    <div class="character-info" id="char2-info">
+      <input type="text" id="char2-name" placeholder="Enter Character 2 Name">
+      <button class="btn" onclick="createCharacter(2)">Create Character 2</button>
+    </div>
 
-    def is_alive(self):
-        """Check if the character is still alive."""
-        return self.health > 0
+    <!-- Combat Area -->
+    <div id="combat-area" style="display: none;">
+      <div class="stats" id="char1-stats"></div>
+      <div class="stats" id="char2-stats"></div>
+      <button class="btn" onclick="startCombat()">Start Combat</button>
+      <div class="result" id="combat-result"></div>
+    </div>
+  </div>
 
-# ============================
-# Modest Clothing for Male Characters
-# ============================
+  <script>
+    // Define Modest Clothing Options for Male Characters
+    const clothingOptions = ["Long Robe", "Jubba", "Shalwar Kameez", "Thobe"];
 
-def assign_clothing():
-    """Assign modest clothing to male characters."""
-    clothing_options = ["Long Robe", "Jubba", "Shalwar Kameez", "Thobe"]
-    return random.choice(clothing_options)
+    // Store character data
+    let character1 = null;
+    let character2 = null;
 
-# ============================
-# Game Mechanics and Combat
-# ============================
+    // Create a character object
+    function createCharacter(characterNum) {
+      const name = document.getElementById(`char${characterNum}-name`).value;
+      if (!name) {
+        alert('Please enter a name');
+        return;
+      }
 
-def combat(character1, character2):
-    """Simulate a turn-based combat between two characters."""
-    print(f"Combat begins between {character1.name} and {character2.name}!")
+      const clothing = clothingOptions[Math.floor(Math.random() * clothingOptions.length)];
+      const character = {
+        name,
+        health: 100,
+        abilities: ['Attack', 'Heal'],
+        clothing
+      };
 
-    while character1.is_alive() and character2.is_alive():
-        # Character 1 attacks first
-        character1.attack(character2)
-        if not character2.is_alive():
-            break
+      // Store character
+      if (characterNum === 1) {
+        character1 = character;
+        document.getElementById('char1-stats').innerText = `${character.name} (Health: ${character.health}, Clothing: ${character.clothing})`;
+        document.getElementById('char1-info').style.display = 'none';
+      } else {
+        character2 = character;
+        document.getElementById('char2-stats').innerText = `${character.name} (Health: ${character.health}, Clothing: ${character.clothing})`;
+        document.getElementById('char2-info').style.display = 'none';
+      }
 
-        # Character 2 attacks second
-        character2.attack(character1)
+      // Show combat area after both characters are created
+      if (character1 && character2) {
+        document.getElementById('combat-area').style.display = 'block';
+      }
+    }
 
-    # Announce the winner
-    if character1.is_alive():
-        print(f"{character1.name} wins the fight!")
-    else:
-        print(f"{character2.name} wins the fight!")
+    // Start the combat sequence
+    function startCombat() {
+      let turn = 1;
+      let combatInterval = setInterval(function() {
+        if (turn % 2 !== 0) {
+          // Character 1 attacks
+          attack(character1, character2);
+        } else {
+          // Character 2 attacks
+          attack(character2, character1);
+        }
 
-# ============================
-# Main Game Loop
-# ============================
+        if (character1.health <= 0 || character2.health <= 0) {
+          clearInterval(combatInterval);
+          const winner = character1.health > 0 ? character1 : character2;
+          document.getElementById('combat-result').innerText = `${winner.name} wins the fight!`;
+        }
 
-def main():
-    """Main function to run the game."""
-    create_database()
+        turn++;
+      }, 1500); // Delay between attacks
+    }
 
-    # Input player names and initialize characters
-    print("Welcome to the Combat Game!")
-    character1_name = input("Enter the name for the first character: ")
-    character1_clothing = assign_clothing()
-    character1 = Character(character1_name, 100, ["Sword Slash", "Shield Block"], character1_clothing)
-    save_character_to_db(character1_name, 100, character1.abilities, character1_clothing)
+    // Perform an attack
+    function attack(attacker, defender) {
+      const damage = Math.floor(Math.random() * 20) + 10; // Random damage between 10 and 30
+      defender.health -= damage;
 
-    character2_name = input("Enter the name for the second character: ")
-    character2_clothing = assign_clothing()
-    character2 = Character(character2_name, 100, ["Bow Shot", "Stealth"], character2_clothing)
-    save_character_to_db(character2_name, 100, character2.abilities, character2_clothing)
+      // Update character stats
+      document.getElementById('char1-stats').innerText = `${character1.name} (Health: ${character1.health}, Clothing: ${character1.clothing})`;
+      document.getElementById('char2-stats').innerText = `${character2.name} (Health: ${character2.health}, Clothing: ${character2.clothing})`;
 
-    # Display initial character information
-    print(f"{character1.name} is wearing {character1.clothing} and has abilities: {character1.abilities}")
-    print(f"{character2.name} is wearing {character2.clothing} and has abilities: {character2.abilities}")
+      if (defender.health < 0) {
+        defender.health = 0;
+      }
 
-    # Combat
-    combat(character1, character2)
-
-    print("Game Over!")
-
-if __name__ == "__main__":
-    main()
-
+      // Display attack result
+      alert(`${attacker.name} attacks ${defender.name} for ${damage} damage!`);
+    }
+  </script>
+</body>
+</html>
 
