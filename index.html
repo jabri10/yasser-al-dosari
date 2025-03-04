@@ -159,6 +159,11 @@
 
     // Start the combat sequence
     function startCombat() {
+      if (!character1 || !character2) {
+        alert("Both characters need to be created!");
+        return;
+      }
+      
       let turn = 1;
       let combatInterval = setInterval(function() {
         if (turn % 2 !== 0) {
@@ -173,6 +178,7 @@
           clearInterval(combatInterval);
           const winner = character1.health > 0 ? character1 : character2;
           document.getElementById('combat-result').innerText = `${winner.name} wins the fight!`;
+          document.getElementById('start-combat-btn').style.display = 'none';  // Hide button after the fight
         }
 
         turn++;
