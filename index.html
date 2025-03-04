@@ -3,146 +3,205 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Islamic Music Player - Yasser Al-Dosari</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <title>Space Shooter Game</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
-      background-color: #f4f4f9;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
       margin: 0;
-    }
-
-    .music-player {
-      background-color: #fff;
-      padding: 20px;
-      border-radius: 10px;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-      width: 600px;
-      text-align: center;
-    }
-
-    h1 {
-      font-size: 24px;
-      color: #333;
-    }
-
-    .controls {
-      margin-top: 20px;
-    }
-
-    .controls button {
-      background-color: #4CAF50;
-      color: white;
-      padding: 15px;
-      border: none;
-      cursor: pointer;
-      border-radius: 5px;
-      font-size: 24px;
-      margin: 5px;
-    }
-
-    .controls button:hover {
-      background-color: #45a049;
-    }
-
-    .playlist {
-      margin-top: 20px;
-      list-style: none;
       padding: 0;
+      background-color: black;
+      font-family: Arial, sans-serif;
     }
 
-    .playlist li {
-      padding: 5px 0;
-      cursor: pointer;
-      color: #333;
+    canvas {
+      display: block;
+      margin: 0 auto;
+      background-color: black;
     }
 
-    .playlist li:hover {
-      color: #4CAF50;
+    .game-over {
+      color: white;
+      font-size: 48px;
+      text-align: center;
+      margin-top: 200px;
+      position: absolute;
+      width: 100%;
     }
 
+    .score {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      color: white;
+      font-size: 24px;
+    }
   </style>
 </head>
 <body>
+  <canvas id="gameCanvas"></canvas>
+  <div class="game-over" id="gameOverText" style="display:none;">Game Over</div>
+  <div class="score" id="scoreText">Score: 0</div>
 
-  <div class="music-player">
-    <h1>Islamic Music Player - Yasser Al-Dosari</h1>
-    
-    <!-- YouTube Player -->
-    <div id="audio-player">
-      <!-- Default Recitation Video -->
-      <div id="player"></div>
-    </div>
-
-    <!-- Playlist -->
-    <ul class="playlist">
-      <li onclick="loadRecitation('YmQ3jK7E-k')">Surah Al-Fatiha - Yasser Al-Dosari</li>
-      <li onclick="loadRecitation('QR0FkgpEwx0')">Surah Al-Baqarah (Verse 255) - Yasser Al-Dosari</li>
-      <li onclick="loadRecitation('ZfzZ0lwMlGM')">Surah Al-Ikhlas - Yasser Al-Dosari</li>
-    </ul>
-
-    <!-- Player Controls -->
-    <div class="controls">
-      <button onclick="playPause()"><i class="fas fa-play"></i></button>
-      <button onclick="stopSong()"><i class="fas fa-stop"></i></button>
-      <button onclick="togglePause()"><i class="fas fa-pause"></i></button>
-    </div>
-  </div>
-
-  <!-- YouTube API Script -->
-  <script src="https://www.youtube.com/iframe_api"></script>
-  
   <script>
-    // Global variable to store the player object
-    let player;
+    // Set up canvas and context
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    canvas.width = 800;
+    canvas.height = 600;
 
-    // This function creates an <iframe> (YouTube player) after the API code downloads.
-    function onYouTubeIframeAPIReady() {
-      player = new YT.Player('player', {
-        height: '315',
-        width: '560',
-        videoId: 'YmQ3jK7E-k', // Default video (Surah Al-Fatiha)
-        events: {
-          'onStateChange': onPlayerStateChange
-        }
-      });
-    }
+    // Game variables
+    let player, bullets = [], enemies = [], score = 0, gameOver = false;
+    const enemySpeed = 2, bulletSpeed = 4;
 
-    // Function to play/pause the video
-    function playPause() {
-      if (player.getPlayerState() === YT.PlayerState.PLAYING) {
-        player.pauseVideo();
-      } else {
-        player.playVideo();
+    // Player object
+    class Player {
+      constructor() {
+        this.x = canvas.width / 2;
+        this.y = canvas.height - 50;
+        this.width = 50;
+        this.height = 50;
+        this.speed = 5;
+        this.image = new Image();
+        this.image.src = 'https://www.iconsdb.com/icons/preview/black/spaceship-xxl.png'; // Spaceship icon
+      }
+      move() {
+        if (keys[37] && this.x > 0) this.x -= this.speed; // Left
+        if (keys[39] && this.x < canvas.width - this.width) this.x += this.speed; // Right
+      }
+      draw() {
+        ctx.drawImage(this.image, this.x, this.y, this.width, this.height);
       }
     }
 
-    // Function to stop the video
-    function stopSong() {
-      player.stopVideo();
+    // Bullet object
+    class Bullet {
+      constructor(x, y) {
+        this.x = x;
+        this.y = y;
+        this.width = 5;
+        this.height = 10;
+      }
+      move() {
+        this.y -= bulletSpeed;
+      }
+      draw() {
+        ctx.fillStyle = 'white';
+        ctx.fillRect(this.x, this.y, this.width, this.height);
+      }
     }
 
-    // Function to toggle play/pause when button is pressed
-    function togglePause() {
-      playPause();
+    // Enemy object
+    class Enemy {
+      constructor() {
+        this.x = Math.random() * (canvas.width - 50);
+        this.y = -50;
+        this.width = 50;
+        this.height = 50;
+      }
+      move() {
+        this.y += enemySpeed;
+      }
+      draw() {
+        ctx.fillStyle = 'red';
+        ctx.fillRect(this.x, this.y, this.width, this.height);
+      }
     }
 
-    // Load a new video when the playlist item is clicked
-    function loadRecitation(videoId) {
-      player.loadVideoById(videoId);
+    // Keyboard controls
+    const keys = {};
+    document.addEventListener('keydown', (e) => { keys[e.keyCode] = true; });
+    document.addEventListener('keyup', (e) => { keys[e.keyCode] = false; });
+
+    // Initialize player
+    player = new Player();
+
+    // Spawn enemies
+    function spawnEnemy() {
+      if (!gameOver) {
+        const enemy = new Enemy();
+        enemies.push(enemy);
+      }
     }
 
-    // Called when the player's state changes (e.g., from playing to paused)
-    function onPlayerStateChange(event) {
-      // You can use this event to do things when the state changes, e.g., update UI
-      console.log("Player State: " + event.data);
+    // Collision detection
+    function checkCollisions() {
+      for (let i = 0; i < bullets.length; i++) {
+        for (let j = 0; j < enemies.length; j++) {
+          if (bullets[i] && enemies[j]) {
+            if (bullets[i].x < enemies[j].x + enemies[j].width &&
+              bullets[i].x + bullets[i].width > enemies[j].x &&
+              bullets[i].y < enemies[j].y + enemies[j].height &&
+              bullets[i].y + bullets[i].height > enemies[j].y) {
+              // Bullet hit enemy
+              enemies.splice(j, 1);
+              bullets.splice(i, 1);
+              score += 10;
+              updateScore();
+              break;
+            }
+          }
+        }
+      }
+
+      for (let i = 0; i < enemies.length; i++) {
+        if (enemies[i].x < player.x + player.width &&
+          enemies[i].x + enemies[i].width > player.x &&
+          enemies[i].y < player.y + player.height &&
+          enemies[i].y + enemies[i].height > player.y) {
+          // Game Over if enemy hits player
+          gameOver = true;
+          document.getElementById('gameOverText').style.display = 'block';
+        }
+      }
     }
+
+    // Update score display
+    function updateScore() {
+      document.getElementById('scoreText').textContent = 'Score: ' + score;
+    }
+
+    // Main game loop
+    function gameLoop() {
+      if (gameOver) return;
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      player.move();
+      player.draw();
+
+      // Draw and move bullets
+      for (let i = 0; i < bullets.length; i++) {
+        bullets[i].move();
+        bullets[i].draw();
+        if (bullets[i].y < 0) bullets.splice(i, 1);
+      }
+
+      // Draw and move enemies
+      for (let i = 0; i < enemies.length; i++) {
+        enemies[i].move();
+        enemies[i].draw();
+        if (enemies[i].y > canvas.height) enemies.splice(i, 1);
+      }
+
+      checkCollisions();
+
+      // Continue game loop
+      if (!gameOver) requestAnimationFrame(gameLoop);
+    }
+
+    // Shoot bullet when spacebar is pressed
+    document.addEventListener('keydown', (e) => {
+      if (e.key === ' ' && !gameOver) {
+        const bullet = new Bullet(player.x + player.width / 2 - 2.5, player.y);
+        bullets.push(bullet);
+      }
+    });
+
+    // Start spawning enemies at intervals
+    setInterval(spawnEnemy, 1000);
+
+    // Start game loop
+    gameLoop();
   </script>
-
 </body>
 </html>
+
 
