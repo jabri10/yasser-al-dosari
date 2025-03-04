@@ -1,30 +1,35 @@
-import asyncio
+import random
 import sqlite3
-from random import randint
+import time
 
 # ============================
 # Database Setup (SQLite)
 # ============================
 
-# Create and initialize SQLite database for storing character data
 def create_database():
+    """Create the database and table if they don't exist."""
     conn = sqlite3.connect('game_data.db')
     cursor = conn.cursor()
-    cursor.execute('''CREATE TABLE IF NOT EXISTS characters (
-                        id INTEGER PRIMARY KEY,
-                        name TEXT NOT NULL,
-                        health INTEGER,
-                        abilities TEXT,
-                        clothing TEXT)''')
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS characters (
+            id INTEGER PRIMARY KEY,
+            name TEXT NOT NULL,
+            health INTEGER,
+            abilities TEXT,
+            clothing TEXT
+        )
+    ''')
     conn.commit()
     conn.close()
 
-# Function to save character to database
 def save_character_to_db(name, health, abilities, clothing):
+    """Save a new character's data into the database."""
     conn = sqlite3.connect('game_data.db')
     cursor = conn.cursor()
-    cursor.execute('''INSERT INTO characters (name, health, abilities, clothing) 
-                      VALUES (?, ?, ?, ?)''', (name, health, abilities, clothing))
+    cursor.execute('''
+        INSERT INTO characters (name, health, abilities, clothing) 
+        VALUES (?, ?, ?, ?)
+    ''', (name, health, str(abilities), clothing))
     conn.commit()
     conn.close()
 
@@ -32,56 +37,62 @@ def save_character_to_db(name, health, abilities, clothing):
 # Character Class
 # ============================
 
-# Character class with basic attributes
 class Character:
     def __init__(self, name, health, abilities, clothing):
         self.name = name
         self.health = health
         self.abilities = abilities
-        self.clothing = clothing  # Modest clothing attribute (only for male characters)
+        self.clothing = clothing  # Modest clothing attribute
 
     def take_damage(self, damage):
+        """Reduce health when taking damage."""
         self.health -= damage
         if self.health < 0:
             self.health = 0
-        print(f"{self.name} took {damage} damage, remaining health: {self.health}.")
+        print(f"{self.name} took {damage} damage, remaining health: {self.health}")
 
     def heal(self, heal_amount):
+        """Heal the character."""
         self.health += heal_amount
-        print(f"{self.name} healed for {heal_amount}, current health: {self.health}.")
+        print(f"{self.name} healed for {heal_amount}, current health: {self.health}")
 
     def attack(self, target):
-        damage = randint(10, 20)  # Random attack damage
+        """Attack the target with random damage."""
+        damage = random.randint(10, 20)
         print(f"{self.name} attacks {target.name}!")
         target.take_damage(damage)
 
     def is_alive(self):
+        """Check if the character is still alive."""
         return self.health > 0
 
 # ============================
 # Modest Clothing for Male Characters
 # ============================
 
-# List of possible modest clothing choices for male characters
 def assign_clothing():
+    """Assign modest clothing to male characters."""
     clothing_options = ["Long Robe", "Jubba", "Shalwar Kameez", "Thobe"]
-    return clothing_options[randint(0, len(clothing_options)-1)]
+    return random.choice(clothing_options)
 
 # ============================
-# Asynchronous Programming (Combat Simulation)
+# Game Mechanics and Combat
 # ============================
 
-# Async function to simulate combat between two characters
-async def combat(character1, character2):
+def combat(character1, character2):
+    """Simulate a turn-based combat between two characters."""
     print(f"Combat begins between {character1.name} and {character2.name}!")
 
     while character1.is_alive() and character2.is_alive():
+        # Character 1 attacks first
         character1.attack(character2)
-        await asyncio.sleep(1)  # Simulate delay between actions
-        if character2.is_alive():
-            character2.attack(character1)
-        await asyncio.sleep(1)
+        if not character2.is_alive():
+            break
 
+        # Character 2 attacks second
+        character2.attack(character1)
+
+    # Announce the winner
     if character1.is_alive():
         print(f"{character1.name} wins the fight!")
     else:
@@ -91,27 +102,31 @@ async def combat(character1, character2):
 # Main Game Loop
 # ============================
 
-async def main():
+def main():
+    """Main function to run the game."""
     create_database()
 
-    # Create two characters (both male with modest clothing)
+    # Input player names and initialize characters
+    print("Welcome to the Combat Game!")
     character1_name = input("Enter the name for the first character: ")
     character1_clothing = assign_clothing()
     character1 = Character(character1_name, 100, ["Sword Slash", "Shield Block"], character1_clothing)
-    save_character_to_db(character1_name, 100, str(character1.abilities), character1_clothing)
+    save_character_to_db(character1_name, 100, character1.abilities, character1_clothing)
 
     character2_name = input("Enter the name for the second character: ")
     character2_clothing = assign_clothing()
     character2 = Character(character2_name, 100, ["Bow Shot", "Stealth"], character2_clothing)
-    save_character_to_db(character2_name, 100, str(character2.abilities), character2_clothing)
+    save_character_to_db(character2_name, 100, character2.abilities, character2_clothing)
 
-    # Display character information
+    # Display initial character information
     print(f"{character1.name} is wearing {character1.clothing} and has abilities: {character1.abilities}")
     print(f"{character2.name} is wearing {character2.clothing} and has abilities: {character2.abilities}")
 
-    # Start combat
-    await combat(character1, character2)
+    # Combat
+    combat(character1, character2)
 
-# Run the game asynchronously
+    print("Game Over!")
+
 if __name__ == "__main__":
-    asyncio.run(main())
+    main()
+
