@@ -3,11 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Simple Music Player</title>
+  <title>Islamic Music Player - Yasser Al-Dosari</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
   <style>
     body {
       font-family: Arial, sans-serif;
-      background-color: #f4f4f4;
+      background-color: #f4f4f9;
       display: flex;
       justify-content: center;
       align-items: center;
@@ -20,7 +21,7 @@
       padding: 20px;
       border-radius: 10px;
       box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-      width: 400px;
+      width: 600px;
       text-align: center;
     }
 
@@ -36,40 +37,16 @@
     .controls button {
       background-color: #4CAF50;
       color: white;
-      padding: 10px 20px;
+      padding: 15px;
       border: none;
       cursor: pointer;
       border-radius: 5px;
-      font-size: 16px;
+      font-size: 24px;
       margin: 5px;
     }
 
     .controls button:hover {
       background-color: #45a049;
-    }
-
-    .progress-bar {
-      width: 100%;
-      height: 10px;
-      background-color: #ddd;
-      border-radius: 5px;
-      margin-top: 10px;
-      position: relative;
-    }
-
-    .progress-bar .progress {
-      height: 100%;
-      background-color: #4CAF50;
-      border-radius: 5px;
-      width: 0%;
-    }
-
-    .volume-control {
-      margin-top: 20px;
-    }
-
-    .volume-control input {
-      width: 100%;
     }
 
     .playlist {
@@ -93,76 +70,75 @@
 <body>
 
   <div class="music-player">
-    <h1>Music Player</h1>
+    <h1>Islamic Music Player - Yasser Al-Dosari</h1>
     
-    <!-- Audio player -->
-    <audio id="audio" preload="auto">
-      <!-- Default audio file -->
-      <source src="song1.mp3" type="audio/mp3">
-      Your browser does not support the audio tag.
-    </audio>
+    <!-- YouTube Player -->
+    <div id="audio-player">
+      <!-- Default Recitation Video -->
+      <div id="player"></div>
+    </div>
 
     <!-- Playlist -->
     <ul class="playlist">
-      <li onclick="loadSong('song1.mp3')">Song 1 - Artist</li>
-      <li onclick="loadSong('song2.mp3')">Song 2 - Artist</li>
-      <li onclick="loadSong('song3.mp3')">Song 3 - Artist</li>
+      <li onclick="loadRecitation('YmQ3jK7E-k')">Surah Al-Fatiha - Yasser Al-Dosari</li>
+      <li onclick="loadRecitation('QR0FkgpEwx0')">Surah Al-Baqarah (Verse 255) - Yasser Al-Dosari</li>
+      <li onclick="loadRecitation('ZfzZ0lwMlGM')">Surah Al-Ikhlas - Yasser Al-Dosari</li>
     </ul>
 
     <!-- Player Controls -->
     <div class="controls">
-      <button onclick="playPause()">Play/Pause</button>
-      <button onclick="stopSong()">Stop</button>
-    </div>
-
-    <!-- Progress bar -->
-    <div class="progress-bar">
-      <div class="progress" id="progress"></div>
-    </div>
-
-    <!-- Volume control -->
-    <div class="volume-control">
-      <label for="volume">Volume:</label>
-      <input type="range" id="volume" min="0" max="1" step="0.1" value="1" onchange="setVolume(this.value)">
+      <button onclick="playPause()"><i class="fas fa-play"></i></button>
+      <button onclick="stopSong()"><i class="fas fa-stop"></i></button>
+      <button onclick="togglePause()"><i class="fas fa-pause"></i></button>
     </div>
   </div>
 
+  <!-- YouTube API Script -->
+  <script src="https://www.youtube.com/iframe_api"></script>
+  
   <script>
-    // Audio element
-    const audio = document.getElementById('audio');
-    const progressBar = document.getElementById('progress');
-    const volumeControl = document.getElementById('volume');
+    // Global variable to store the player object
+    let player;
 
-    // Play or Pause the audio
+    // This function creates an <iframe> (YouTube player) after the API code downloads.
+    function onYouTubeIframeAPIReady() {
+      player = new YT.Player('player', {
+        height: '315',
+        width: '560',
+        videoId: 'YmQ3jK7E-k', // Default video (Surah Al-Fatiha)
+        events: {
+          'onStateChange': onPlayerStateChange
+        }
+      });
+    }
+
+    // Function to play/pause the video
     function playPause() {
-      if (audio.paused) {
-        audio.play();
+      if (player.getPlayerState() === YT.PlayerState.PLAYING) {
+        player.pauseVideo();
       } else {
-        audio.pause();
+        player.playVideo();
       }
     }
 
-    // Stop the audio
+    // Function to stop the video
     function stopSong() {
-      audio.pause();
-      audio.currentTime = 0;
+      player.stopVideo();
     }
 
-    // Update the progress bar as the song plays
-    audio.addEventListener('timeupdate', function() {
-      const progress = (audio.currentTime / audio.duration) * 100;
-      progressBar.style.width = progress + '%';
-    });
-
-    // Load a new song from the playlist
-    function loadSong(songFile) {
-      audio.src = songFile;
-      audio.play();
+    // Function to toggle play/pause when button is pressed
+    function togglePause() {
+      playPause();
     }
 
-    // Set the volume based on the slider
-    function setVolume(value) {
-      audio.volume = value;
+    // Load a new video when the playlist item is clicked
+    function loadRecitation(videoId) {
+      player.loadVideoById(videoId);
+    }
+
+    // Called when the player's state changes (e.g., from playing to paused)
+    function onPlayerStateChange(event) {
+      // You can use this event to do things when the state changes, e.g., update UI
     }
   </script>
 
