@@ -1,0 +1,172 @@
+import asyncio
+import requests
+from sqlalchemy import create_engine, Column, Integer, String, Text
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker
+
+# ============================
+# Advanced Object-Oriented Programming (OOP)
+# ============================
+
+# Base class for SQLAlchemy ORM
+Base = declarative_base()
+
+# Character class using SQLAlchemy ORM and Inheritance
+class Character(Base):
+    __tablename__ = 'characters'
+    
+    id = Column(Integer, primary_key=True)
+    name = Column(String, nullable=False)
+    health = Column(Integer, nullable=False)
+    abilities = Column(Text, nullable=False)
+
+    def __init__(self, name, health, abilities):
+        self.name = name
+        self.health = health
+        self.abilities = abilities
+    
+    def take_damage(self, damage):
+        self.health -= damage
+        print(f"{self.name} took {damage} damage, {self.health} health remaining.")
+        
+    def heal(self, heal_amount):
+        self.health += heal_amount
+        print(f"{self.name} healed {heal_amount} health, {self.health} health now.")
+
+    def __repr__(self):
+        return f"Character(name={self.name}, health={self.health}, abilities={self.abilities})"
+
+# Advanced Character subclass for a specific type of character
+class Warrior(Character):
+    def __init__(self, name, health, abilities, defense):
+        super().__init__(name, health, abilities)
+        self.defense = defense
+
+    def take_damage(self, damage):
+        damage -= self.defense
+        if damage < 0:
+            damage = 0
+        super().take_damage(damage)
+
+class Mage(Character):
+    def __init__(self, name, health, abilities, mana):
+        super().__init__(name, health, abilities)
+        self.mana = mana
+
+    def cast_spell(self, spell):
+        if self.mana >= 10:
+            self.mana -= 10
+            print(f"{self.name} casts {spell}! Mana left: {self.mana}")
+        else:
+            print(f"{self.name} doesn't have enough mana!")
+
+# ============================
+# Data Structures and Algorithms
+# ============================
+
+# Advanced algorithm: Binary Search (on a sorted list of health values)
+def binary_search(characters, target_health):
+    low = 0
+    high = len(characters) - 1
+    while low <= high:
+        mid = (low + high) // 2
+        if characters[mid].health == target_health:
+            return characters[mid]
+        elif characters[mid].health < target_health:
+            low = mid + 1
+        else:
+            high = mid - 1
+    return None
+
+# Sorting characters based on health (using quicksort algorithm)
+def quicksort(characters):
+    if len(characters) <= 1:
+        return characters
+    pivot = characters[len(characters) // 2]
+    left = [char for char in characters if char.health < pivot.health]
+    right = [char for char in characters if char.health > pivot.health]
+    return quicksort(left) + [pivot] + quicksort(right)
+
+# ============================
+# Working with Libraries and Frameworks
+# ============================
+
+# Setup SQLAlchemy engine and session to interact with SQLite
+engine = create_engine('sqlite:///game_data.db')
+Base.metadata.create_all(engine)
+
+Session = sessionmaker(bind=engine)
+session = Session()
+
+# Adding new characters to the database
+def add_character_to_db(character):
+    session.add(character)
+    session.commit()
+    print(f"Character {character.name} added to database.")
+
+# Simulate making an HTTP request to fetch additional character data (using requests library)
+def fetch_character_data_from_api(character_name):
+    url = f'https://api.example.com/characters/{character_name}'
+    response = requests.get(url)
+    if response.status_code == 200:
+        data = response.json()
+        print(f"Fetched data for {character_name}: {data}")
+    else:
+        print(f"Failed to fetch data for {character_name}")
+
+# ============================
+# Asynchronous Programming
+# ============================
+
+# Async function to simulate character creation with a delay
+async def async_create_character(name, health, abilities, delay):
+    await asyncio.sleep(delay)
+    print(f"Creating character {name} with health {health} and abilities: {abilities}")
+    return Character(name, health, abilities)
+
+# Async task to save multiple characters concurrently
+async def save_characters_async(characters):
+    tasks = []
+    for char in characters:
+        task = asyncio.create_task(save_character_to_db_async(char))
+        tasks.append(task)
+    await asyncio.gather(*tasks)
+
+async def save_character_to_db_async(character):
+    print(f"Saving {character.name} asynchronously to DB...")
+    await asyncio.sleep(2)
+    session.add(character)
+    session.commit()
+    print(f"{character.name} saved asynchronously.")
+
+# ============================
+# Main Execution Flow
+# ============================
+
+async def main():
+    # Create characters
+    warrior = Warrior("Warrior", 150, ["Sword Slash", "Shield Block"], 20)
+    mage = Mage("Mage", 100, ["Fireball", "Ice Blast"], 50)
+    archer = Character("Archer", 120, ["Arrow Shot", "Eagle Eye"])
+
+    # Create and save characters concurrently (asynchronous)
+    await save_characters_async([warrior, mage, archer])
+
+    # Fetch additional character data (simulate external API call)
+    fetch_character_data_from_api("Warrior")
+
+    # Sorting characters by health using quicksort
+    sorted_characters = quicksort([warrior, mage, archer])
+    print(f"Sorted characters by health: {sorted_characters}")
+
+    # Perform a binary search to find a character based on health
+    target_health = 120
+    found_character = binary_search(sorted_characters, target_health)
+    if found_character:
+        print(f"Found character with health {target_health}: {found_character}")
+    else:
+        print(f"No character found with health {target_health}.")
+
+# Run the main async function
+if __name__ == '__main__':
+    asyncio.run(main())
