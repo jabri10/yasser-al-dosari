@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Simple Quran App</title>
+  <title>Quran App</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -48,6 +48,9 @@
     #audio {
       margin-top: 20px;
     }
+    #verse-navigation {
+      margin-top: 20px;
+    }
   </style>
 </head>
 <body>
@@ -80,10 +83,18 @@
     <div id="audio">
       <button onclick="playAudio()">Play Recitation</button>
     </div>
+
+    <div id="verse-navigation">
+      <button onclick="prevVerse()">Previous Verse</button>
+      <button onclick="nextVerse()">Next Verse</button>
+    </div>
   </div>
 
   <script>
     const apiBaseUrl = 'https://api.alquran.cloud/v1';
+    let currentSurah = null;
+    let currentVerseIndex = 0;
+    let surahData = null;
 
     // Fetch and display the Surah list
     async function loadSurahs() {
@@ -102,30 +113,51 @@
       }
     }
 
-    // Fetch Surah details and display the first verse's Arabic text and translation
+    // Fetch Surah details and display all verses
     async function loadSurahDetails(surahNumber) {
       try {
         const response = await fetch(`${apiBaseUrl}/surah/${surahNumber}`);
         const data = await response.json();
         
-        const verseText = document.getElementById('verse-text');
-        const translationText = document.getElementById('translation-text');
-        const audioButton = document.getElementById('audio').querySelector('button');
+        // Store the Surah data
+        surahData = data.data;
 
-        // Display the first verse (for simplicity)
-        const verse = data.data.ayahs[0];  // Get the first verse of the Surah
-        verseText.textContent = verse.text;  // Display Arabic text
+        // Set the Surah name
+        currentSurah = surahNumber;
 
-        // Fetch English translation
-        const translationResponse = await fetch(`${apiBaseUrl}/surah/${surahNumber}/en.asad`);
-        const translationData = await translationResponse.json();
-        translationText.textContent = translationData.data[0].text; // Display the translation of the first verse
+        // Reset verse index
+        currentVerseIndex = 0;
 
-        // Set up audio for the recitation
-        audioButton.onclick = () => playAudio(verse.numberInSurah);  // Play recitation for this verse
+        // Display the first verse
+        displayVerse(currentVerseIndex);
       } catch (error) {
         console.error('Error loading Surah details:', error);
       }
+    }
+
+    // Display the current verse and its translation
+    async function displayVerse(verseIndex) {
+      if (!surahData) return;
+
+      const verse = surahData.ayahs[verseIndex];
+      const verseText = document.getElementById('verse-text');
+      const translationText = document.getElementById('translation-text');
+      const audioButton = document.getElementById('audio').querySelector('button');
+
+      // Display Arabic verse text
+      verseText.textContent = verse.text;
+
+      // Fetch and display translation (using `en.asad`)
+      const translationResponse = await fetch(`${apiBaseUrl}/surah/${currentSurah}/en.asad`);
+      const translationData = await translationResponse.json();
+      if (translationData.data && translationData.data[verseIndex]) {
+        translationText.textContent = translationData.data[verseIndex].text;
+      } else {
+        translationText.textContent = 'Translation not available.';
+      }
+
+      // Set up audio for the recitation of the current verse
+      audioButton.onclick = () => playAudio(verse.numberInSurah);
     }
 
     // Play audio for the given verse number and reciter
@@ -151,6 +183,22 @@
 
       const audio = new Audio(recitationUrl);
       audio.play();
+    }
+
+    // Navigate to the previous verse
+    function prevVerse() {
+      if (currentVerseIndex > 0) {
+        currentVerseIndex--;
+        displayVerse(currentVerseIndex);
+      }
+    }
+
+    // Navigate to the next verse
+    function nextVerse() {
+      if (currentVerseIndex < surahData.ayahs.length - 1) {
+        currentVerseIndex++;
+        displayVerse(currentVerseIndex);
+      }
     }
 
     // Load Surahs when the page is loaded
