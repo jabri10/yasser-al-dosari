@@ -84,38 +84,11 @@
         const surahList = document.getElementById('surah-list');
         data.data.forEach(surah => {
           const li = document.createElement('li');
-          li.textContent = `${surah.number}. ${surah.name}`;
-          li.onclick = () => loadSurah(surah.number);
+          li.innerHTML = `<a href="surah.html?number=${surah.number}">${surah.number}. ${surah.name}</a>`;
           surahList.appendChild(li);
         });
       } catch (error) {
         console.error('Error loading Surahs:', error);
-      }
-    }
-
-    // Load a specific Surah
-    async function loadSurah(surahNumber) {
-      try {
-        const response = await fetch(`${apiBaseUrl}/surah/${surahNumber}`);
-        const data = await response.json();
-        const verseText = document.getElementById('verse-text');
-        const translationText = document.getElementById('translation-text');
-        const audioButton = document.getElementById('audio').querySelector('button');
-
-        // Display the first verse (for simplicity)
-        const verse = data.data.ayahs[0];
-        verseText.textContent = verse.text;
-        translationText.textContent = 'Loading translation...';
-
-        // Fetch English translation
-        const translationResponse = await fetch(`${apiBaseUrl}/surah/${surahNumber}/en.asad`);
-        const translationData = await translationResponse.json();
-        translationText.textContent = translationData.data[0].text;
-
-        // Set up audio for the recitation
-        audioButton.onclick = () => playAudio(verse.numberInSurah);
-      } catch (error) {
-        console.error('Error loading Surah:', error);
       }
     }
 
@@ -131,6 +104,7 @@
   </script>
 </body>
 </html>
+
 
 
 
