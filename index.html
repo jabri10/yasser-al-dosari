@@ -3,62 +3,91 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quran Recitation with Translation</title>
+    <title>Quran Search - Recitation and Translation</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            margin: 20px;
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f7f6;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
         }
         h1 {
             color: #4CAF50;
+            font-size: 36px;
+            margin-top: 20px;
         }
-        .surah-btn {
-            margin: 10px;
-            padding: 10px 20px;
+        .search-bar {
+            margin-top: 30px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .search-bar input {
             font-size: 18px;
+            padding: 10px;
+            width: 200px;
+            border: 2px solid #ccc;
+            border-radius: 5px;
+        }
+        .search-bar button {
+            padding: 10px;
             background-color: #4CAF50;
             color: white;
             border: none;
+            border-radius: 5px;
+            font-size: 18px;
             cursor: pointer;
         }
-        .surah-btn:hover {
+        .search-bar button:hover {
             background-color: #45a049;
+        }
+        .verse-container {
+            text-align: center;
+            margin-top: 20px;
+            max-width: 800px;
+            width: 100%;
+        }
+        .verse-arabic {
+            font-size: 24px;
+            margin-bottom: 10px;
+            color: #333;
+        }
+        .verse-translation {
+            font-size: 18px;
+            margin-bottom: 20px;
+            color: #555;
         }
         audio {
             margin-top: 20px;
+            width: 100%;
+            max-width: 600px;
         }
-        .surah-container {
-            margin-top: 20px;
-            text-align: left;
-            max-width: 800px;
-            margin-left: auto;
-            margin-right: auto;
-        }
-        .surah-arabic {
-            font-size: 24px;
-            color: #000;
-            margin-bottom: 10px;
-        }
-        .surah-translation {
+        .loading {
             font-size: 18px;
-            color: #555;
-            margin-bottom: 20px;
+            color: #666;
+            margin-top: 20px;
         }
     </style>
 </head>
 <body>
 
-    <h1>Quran Recitation by Sheikh Minshawi</h1>
-    
-    <p>Select a Surah to listen to the recitation:</p>
+    <h1>Quran Search</h1>
 
-    <button class="surah-btn" onclick="loadSurah(1)">Surah Al-Fatiha</button>
-    <button class="surah-btn" onclick="loadSurah(2)">Surah Al-Baqarah</button>
-    <button class="surah-btn" onclick="loadSurah(3)">Surah Al-Imran</button>
-    
-    <div class="surah-container" id="surahContainer">
-        <!-- Arabic and Translation will be inserted here dynamically -->
+    <div class="search-bar">
+        <input type="text" id="verseNumber" placeholder="Enter verse number (e.g. 1:1)">
+        <button onclick="searchVerse()">Search</button>
+    </div>
+
+    <div class="verse-container" id="verseContainer">
+        <!-- Verse and translation will be displayed here -->
+    </div>
+
+    <div class="loading" id="loadingMessage" style="display:none;">
+        Loading verse, please wait...
     </div>
 
     <audio id="audioPlayer" controls>
@@ -67,58 +96,68 @@
     </audio>
 
     <script>
-        // Surah details: The first URL is for the recitation audio, second is for the corresponding text files.
-        const surahData = {
-            1: {
-                arabicFile: "quran_uthmani.txt", // Placeholder for actual Arabic text file for Surah Al-Fatiha
-                translationFile: "translation_english.txt", // Placeholder for actual English translation file for Surah Al-Fatiha
-                audioUrl: "https://server10.mp3quran.net/minsh/001.mp3" // Audio URL for Surah Al-Fatiha
-            },
-            2: {
-                arabicFile: "quran_uthmani.txt", // Placeholder for actual Arabic text file for Surah Al-Baqarah
-                translationFile: "translation_english.txt", // Placeholder for actual English translation file for Surah Al-Baqarah
-                audioUrl: "https://server10.mp3quran.net/minsh/002.mp3" // Audio URL for Surah Al-Baqarah
-            },
-            3: {
-                arabicFile: "quran_uthmani.txt", // Placeholder for actual Arabic text file for Surah Al-Imran
-                translationFile: "translation_english.txt", // Placeholder for actual English translation file for Surah Al-Imran
-                audioUrl: "https://server10.mp3quran.net/minsh/003.mp3" // Audio URL for Surah Al-Imran
-            }
-        };
+        const baseApiUrl = 'https://api.alquran.cloud/v1/ayah/';
 
-        // Load the Surah's Arabic text, translation, and audio
-        function loadSurah(surahId) {
-            const surah = surahData[surahId];
-            
-            // Fetch Arabic and translation texts from the server or local files (you can modify this part based on your actual implementation)
-            fetch(surah.arabicFile)
-                .then(response => response.text())
-                .then(arabicText => {
-                    // Fetch the English translation
-                    fetch(surah.translationFile)
-                        .then(response => response.text())
-                        .then(translationText => {
-                            // Display the Surah Arabic text and its translation
-                            const surahContainer = document.getElementById('surahContainer');
-                            surahContainer.innerHTML = `
-                                <div class="surah-arabic">${arabicText}</div>
-                                <div class="surah-translation">${translationText}</div>
-                            `;
-                            
-                            // Set the audio URL for recitation
-                            const audioPlayer = document.getElementById('audioPlayer');
-                            const audioSource = document.getElementById('audioSource');
-                            audioSource.src = surah.audioUrl;
-                            audioPlayer.load();
-                            audioPlayer.play();
-                        });
+        // Function to search for a specific verse
+        function searchVerse() {
+            const verseInput = document.getElementById('verseNumber').value;
+            const versePattern = /^(\d+):(\d+)$/;  // Regex for Surah:Ayah format
+            const match = verseInput.match(versePattern);
+
+            if (match) {
+                const surahNumber = match[1];
+                const ayahNumber = match[2];
+                fetchVerse(surahNumber, ayahNumber);
+            } else {
+                alert("Please enter a valid Surah:Ayah format (e.g., 1:1)");
+            }
+        }
+
+        // Function to fetch the verse from the API
+        function fetchVerse(surahNumber, ayahNumber) {
+            const url = `${baseApiUrl}${surahNumber}:${ayahNumber}`;
+            const verseContainer = document.getElementById('verseContainer');
+            const loadingMessage = document.getElementById('loadingMessage');
+
+            // Show loading message
+            loadingMessage.style.display = 'block';
+
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    loadingMessage.style.display = 'none';
+
+                    if (data.status === 'OK') {
+                        const verseData = data.data;
+
+                        const arabicText = verseData.text;
+                        const translationText = verseData.translation;
+                        const audioUrl = verseData.audioUrl;
+
+                        // Update the UI with the verse and translation
+                        verseContainer.innerHTML = `
+                            <div class="verse-arabic">${arabicText}</div>
+                            <div class="verse-translation">${translationText}</div>
+                        `;
+
+                        // Set audio source and play
+                        const audioPlayer = document.getElementById('audioPlayer');
+                        const audioSource = document.getElementById('audioSource');
+                        audioSource.src = audioUrl;
+                        audioPlayer.load();
+                        audioPlayer.play();
+                    } else {
+                        verseContainer.innerHTML = 'Verse not found. Please try again.';
+                    }
                 })
                 .catch(error => {
-                    console.error("Error loading text files:", error);
-                    alert("Error loading Surah content.");
+                    loadingMessage.style.display = 'none';
+                    console.error('Error fetching verse:', error);
+                    verseContainer.innerHTML = 'An error occurred while fetching the verse.';
                 });
         }
     </script>
 
 </body>
 </html>
+
