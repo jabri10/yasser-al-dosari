@@ -1,151 +1,124 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Quran Viewer - A Guide to the Quran</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
-  <style>
-    body {
-      font-family: 'Arial', sans-serif;
-      margin: 0;
-      padding: 0;
-      background-color: #f4f4f4;
-    }
-    header {
-      background-color: #013d58;
-      padding: 20px;
-      text-align: center;
-      color: white;
-    }
-    header h1 {
-      margin: 0;
-      font-size: 2.5rem;
-    }
-    .nav {
-      display: flex;
-      justify-content: center;
-      background-color: #022c43;
-      padding: 10px;
-    }
-    .nav a {
-      color: white;
-      text-decoration: none;
-      padding: 10px 20px;
-      margin: 0 10px;
-      font-size: 1.2rem;
-      transition: background-color 0.3s;
-    }
-    .nav a:hover {
-      background-color: #01829f;
-    }
-    .content {
-      padding: 20px;
-    }
-    .card {
-      background-color: white;
-      padding: 15px;
-      margin: 15px;
-      border-radius: 5px;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-      width: 300px;
-      display: inline-block;
-      text-align: center;
-      transition: transform 0.3s;
-    }
-    .card:hover {
-      transform: scale(1.05);
-    }
-    footer {
-      background-color: #022c43;
-      color: white;
-      text-align: center;
-      padding: 10px;
-      position: fixed;
-      width: 100%;
-      bottom: 0;
-    }
-    .footer-links a {
-      color: white;
-      text-decoration: none;
-      padding: 5px 10px;
-      font-size: 1rem;
-    }
-    .footer-links a:hover {
-      text-decoration: underline;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quran Recitation with Translation</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 20px;
+        }
+        h1 {
+            color: #4CAF50;
+        }
+        .surah-btn {
+            margin: 10px;
+            padding: 10px 20px;
+            font-size: 18px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        .surah-btn:hover {
+            background-color: #45a049;
+        }
+        audio {
+            margin-top: 20px;
+        }
+        .surah-container {
+            margin-top: 20px;
+            text-align: left;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .surah-arabic {
+            font-size: 24px;
+            color: #000;
+            margin-bottom: 10px;
+        }
+        .surah-translation {
+            font-size: 18px;
+            color: #555;
+            margin-bottom: 20px;
+        }
+    </style>
 </head>
 <body>
 
-  <!-- Header Section -->
-  <header>
-    <h1>Quran Viewer</h1>
-    <p>Your guide to the Quran, its Surahs, meanings, and recitations.</p>
-  </header>
+    <h1>Quran Recitation by Sheikh Minshawi</h1>
+    
+    <p>Select a Surah to listen to the recitation:</p>
 
-  <!-- Navigation Bar -->
-  <div class="nav">
-    <a href="#home">Home</a>
-    <a href="#surahs">Surah List</a>
-    <a href="#about">About</a>
-    <a href="#contact">Contact</a>
-  </div>
-
-  <!-- Main Content -->
-  <div class="content" id="home">
-    <h2>Welcome to the Quran Viewer</h2>
-    <p>Explore the divine verses of the Quran with detailed translations and explanations. This site offers an easy way to access each Surah of the Quran, learn its meanings, and listen to its recitations.</p>
-
-    <div id="surahs">
-      <h3>List of Surahs</h3>
-      <div class="card">
-        <h4>Surah Al-Fatiha</h4>
-        <p>The Opening</p>
-        <a href="#">Read More</a>
-      </div>
-      <div class="card">
-        <h4>Surah Al-Baqarah</h4>
-        <p>The Cow</p>
-        <a href="#">Read More</a>
-      </div>
-      <div class="card">
-        <h4>Surah Al-Ikhlas</h4>
-        <p>The Sincerity</p>
-        <a href="#">Read More</a>
-      </div>
+    <button class="surah-btn" onclick="loadSurah(1)">Surah Al-Fatiha</button>
+    <button class="surah-btn" onclick="loadSurah(2)">Surah Al-Baqarah</button>
+    <button class="surah-btn" onclick="loadSurah(3)">Surah Al-Imran</button>
+    
+    <div class="surah-container" id="surahContainer">
+        <!-- Arabic and Translation will be inserted here dynamically -->
     </div>
-  </div>
 
-  <!-- About Section -->
-  <div class="content" id="about">
-    <h3>About Quran Viewer</h3>
-    <p>This website is dedicated to providing easy access to the Quran's teachings and meanings. Our goal is to make the Quran available to Muslims around the world in a modern, digital format, accessible from anywhere.</p>
-  </div>
+    <audio id="audioPlayer" controls>
+        <source id="audioSource" src="" type="audio/mp3">
+        Your browser does not support the audio element.
+    </audio>
 
-  <!-- Contact Section -->
-  <div class="content" id="contact">
-    <h3>Contact Us</h3>
-    <p>If you have any questions or suggestions, feel free to reach out to us.</p>
-    <form action="#">
-      <label for="name">Name:</label>
-      <input type="text" id="name" name="name" required><br><br>
-      <label for="email">Email:</label>
-      <input type="email" id="email" name="email" required><br><br>
-      <label for="message">Message:</label><br>
-      <textarea id="message" name="message" rows="4" cols="50" required></textarea><br><br>
-      <button type="submit">Send Message</button>
-    </form>
-  </div>
+    <script>
+        // Surah details: The first URL is for the recitation audio, second is for the corresponding text files.
+        const surahData = {
+            1: {
+                arabicFile: "quran_uthmani.txt", // Placeholder for actual Arabic text file for Surah Al-Fatiha
+                translationFile: "translation_english.txt", // Placeholder for actual English translation file for Surah Al-Fatiha
+                audioUrl: "https://server10.mp3quran.net/minsh/001.mp3" // Audio URL for Surah Al-Fatiha
+            },
+            2: {
+                arabicFile: "quran_uthmani.txt", // Placeholder for actual Arabic text file for Surah Al-Baqarah
+                translationFile: "translation_english.txt", // Placeholder for actual English translation file for Surah Al-Baqarah
+                audioUrl: "https://server10.mp3quran.net/minsh/002.mp3" // Audio URL for Surah Al-Baqarah
+            },
+            3: {
+                arabicFile: "quran_uthmani.txt", // Placeholder for actual Arabic text file for Surah Al-Imran
+                translationFile: "translation_english.txt", // Placeholder for actual English translation file for Surah Al-Imran
+                audioUrl: "https://server10.mp3quran.net/minsh/003.mp3" // Audio URL for Surah Al-Imran
+            }
+        };
 
-  <!-- Footer Section -->
-  <footer>
-    <p>© 2025 Quran Viewer</p>
-    <div class="footer-links">
-      <a href="#">Privacy Policy</a> | 
-      <a href="#">Terms of Use</a>
-    </div>
-  </footer>
+        // Load the Surah's Arabic text, translation, and audio
+        function loadSurah(surahId) {
+            const surah = surahData[surahId];
+            
+            // Fetch Arabic and translation texts from the server or local files (you can modify this part based on your actual implementation)
+            fetch(surah.arabicFile)
+                .then(response => response.text())
+                .then(arabicText => {
+                    // Fetch the English translation
+                    fetch(surah.translationFile)
+                        .then(response => response.text())
+                        .then(translationText => {
+                            // Display the Surah Arabic text and its translation
+                            const surahContainer = document.getElementById('surahContainer');
+                            surahContainer.innerHTML = `
+                                <div class="surah-arabic">${arabicText}</div>
+                                <div class="surah-translation">${translationText}</div>
+                            `;
+                            
+                            // Set the audio URL for recitation
+                            const audioPlayer = document.getElementById('audioPlayer');
+                            const audioSource = document.getElementById('audioSource');
+                            audioSource.src = surah.audioUrl;
+                            audioPlayer.load();
+                            audioPlayer.play();
+                        });
+                })
+                .catch(error => {
+                    console.error("Error loading text files:", error);
+                    alert("Error loading Surah content.");
+                });
+        }
+    </script>
 
 </body>
 </html>
