@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Music Player with Feedback</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background-color: #f0f0f0;
+        }
+        #player {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+        #track-info {
+            margin-bottom: 10px;
+        }
+        #progress-bar {
+            width: 100%;
+            height: 5px;
+            background-color: #ddd;
+            margin: 10px 0;
+            cursor: pointer;
+        }
+        #progress {
+            width: 0;
+            height: 100%;
+            background-color: #007bff;
+        }
+        #volume-control {
+            margin-left: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div id="player">
+        <div id="track-info">
+            <span id="track-title">Track Title</span> - <span id="track-artist">Artist</span>
+        </div>
+        <audio id="audio" controls>
+            <source src="audio/your-audio-file1.mp3" type="audio/mpeg">
+            <source src="audio/your-audio-file2.mp3" type="audio/mpeg">
+            <source src="audio/your-audio-file3.mp3" type="audio/mpeg">
+            Your browser does not support the audio element.
+        </audio>
+        <div id="progress-bar" onclick="setProgress(event)">
+            <div id="progress"></div>
+        </div>
+        <div id="controls">
+            <input type="range" id="volume-control" min="0" max="1" step="0.01">
+        </div>
+    </div>
+    
+    <div id="feedback-form">
+        <h2>Feedback</h2>
+        <iframe src="https://docs.google.com/forms/d/e/1FAIpQLScZtFke_SZebayJ0-NL17kmXsRVftgDzxJ_mSaz4EloJjM4qg/viewform?embedded=true" width="640" height="800" frameborder="0" marginheight="0" marginwidth="0">Loading…</iframe>
+    </div>
+
+    <script>
+        const audio = document.getElementById('audio');
+        const progressBar = document.getElementById('progress-bar');
+        const progress = document.getElementById('progress');
+        const volumeControl = document.getElementById('volume-control');
+
+        audio.addEventListener('timeupdate', () => {
+            const percent = (audio.currentTime / audio.duration) * 100;
+            progress.style.width = percent + '%';
+        });
+
+        function setProgress(event) {
+            const width = progressBar.clientWidth;
+            const clickX = event.offsetX;
+            const duration = audio.duration;
+
+            audio.currentTime = (clickX / width) * duration;
+        }
+
+        volumeControl.addEventListener('input', (event) => {
+            audio.volume = event.target.value;
+        });
+
+        // Update track info (replace with your logic)
+        document.getElementById('track-title').textContent = "Your Track Title";
+        document.getElementById('track-artist').textContent = "Your Artist";
+    </script>
+</body>
+</html>
