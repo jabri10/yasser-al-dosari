@@ -2,118 +2,151 @@
 <html lang="ar">
 
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Quran Inspired Page</title>
-  <style>
-    /* Quran Inspired Styles */
-    body {
-      font-family: 'Times New Roman', serif;
-      background-color: #f8f8f0;
-      color: #333;
-      line-height: 1.6;
-      margin: 0;
-      padding: 0;
-      /* Background image with the Quranic verse calligraphy */
-      background-image: url('https://www.freepik.com/premium-vector/islamic-calligraphy-vector-arabic-artwork-vector-calligraphy-quran-qs-al-hijr-15-46_138289469.htm');
-      background-repeat: no-repeat;
-      background-size: cover;
-      background-position: center center;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quranic Verse Search</title>
+    <style>
+        body {
+            font-family: 'Times New Roman', serif;
+            background-color: #f8f8f0;
+            color: #333;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            background-image: url(background-image: url('https://www.example.com/quranic-calligraphy-image.jpg'); 
+            background-repeat: no-repeat;
+            background-size: cover;
+            background-position: center center;
+        }
 
-    .container {
-      width: 80%;
-      max-width: 1200px;
-      margin: 20px auto;
-      padding: 20px;
-      background-color: rgba(255, 255, 255, 0.8); /* Semi-transparent background for readability */
-      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    }
+        .container {
+            width: 80%;
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: rgba(255, 255, 255, 0.8);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
 
-    h1,
-    h2,
-    h3 {
-      color: #285943;
-      font-family: 'Georgia', serif;
-      text-align: center;
-      margin-bottom: 20px;
-    }
+        h1 {
+            color: #285943;
+            font-family: 'Georgia', serif;
+            text-align: center;
+            margin-bottom: 20px;
+        }
 
-    a {
-      color: #8b0000;
-      text-decoration: none;
-    }
+        .search-bar {
+            margin: 20px 0;
+            text-align: center;
+        }
 
-    a:hover {
-      text-decoration: underline;
-    }
+        .search-bar input {
+            padding: 10px;
+            font-size: 1em;
+            width: 300px;
+            border: 2px solid #285943;
+            border-radius: 5px;
+            outline: none;
+        }
 
-    .arabic-text {
-      font-family: 'Scheherazade New', serif;
-      font-size: 2em;
-      line-height: 2;
-      color: #554433;
-      text-align: right;
-      direction: rtl;
-    }
+        .search-bar button {
+            padding: 10px 15px;
+            font-size: 1em;
+            background-color: #285943;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
 
-    .verse-translation {
-      font-style: italic;
-      color: #777;
-      text-align: left;
-    }
+        .search-bar button:hover {
+            background-color: #2c6e56;
+        }
 
-    .footer {
-      text-align: center;
-      margin-top: 50px;
-      padding: 20px 0;
-      background-color: #f0f0f0;
-      color: #555;
-      border-top: 1px solid #ddd;
-    }
-  </style>
+        .arabic-text {
+            font-family: 'Scheherazade New', serif;
+            font-size: 2em;
+            line-height: 2;
+            color: #554433;
+            text-align: right;
+            direction: rtl;
+        }
+
+        .verse-translation {
+            font-style: italic;
+            color: #777;
+            text-align: left;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 50px;
+            padding: 20px 0;
+            background-color: #f0f0f0;
+            color: #555;
+            border-top: 1px solid #ddd;
+        }
+    </style>
 </head>
 
 <body>
-  <div class="container">
-    <h1>Quranic Verse</h1>
+    <div class="container">
+        <h1>Quranic Verse Search</h1>
 
-    <!-- Arabic Verse -->
-    <div class="arabic-text" id="arabic-verse">
-      نَّ هَٰذَا الْقُرْآنَ يَهْدِي لِلَّتِي هِيَ أَقْوَمُ وَيُبَشِّرُ الْمُؤْمِنِينَ الَّذِينَ يَعْمَلُونَ الصَّالِحَاتِ أَنَّ لَهُمْ أَجْرًا كَبِيرًا
+        <!-- Search Bar -->
+        <div class="search-bar">
+            <input type="text" id="verse-id" placeholder="Enter verse ID (e.g., 2/255)" />
+            <button onclick="searchVerse()">Search</button>
+        </div>
+
+        <!-- Arabic Verse -->
+        <div class="arabic-text" id="arabic-verse">
+            <!-- The Arabic text will be inserted here -->
+        </div>
+
+        <!-- English Translation -->
+        <div class="verse-translation" id="english-translation">
+            <!-- The English translation will be inserted here -->
+        </div>
+
+        <div class="footer">
+            <p>&copy; 2025 Quran Inspired. All Rights Reserved.</p>
+        </div>
     </div>
 
-    <!-- English Translation -->
-    <div class="verse-translation" id="english-translation">
-      This is the Qur'an, which guides to what is most upright and gives good tidings to the believers who do righteous deeds that they will have a great reward.
-    </div>
+    <script>
+        // Function to fetch the Quranic verse and translation based on search input
+        async function searchVerse() {
+            const verseId = document.getElementById('verse-id').value.trim(); // Get verse ID from search input
+            if (!verseId) {
+                alert('Please enter a verse ID');
+                return;
+            }
 
-    <div class="footer">
-      <p>&copy; 2025 Quran Inspired. All Rights Reserved.</p>
-    </div>
-  </div>
+            const apiUrl = `https://api.alquran.cloud/v1/ayah/${verseId}/translation/en`;
 
-  <script>
-    // Fetch translation from an API
-    async function fetchTranslation() {
-      const apiUrl = 'https://api.alquran.cloud/v1/ayah/46/30/translation/en'; // Example API for translations
-      try {
-        const response = await fetch(apiUrl);
-        const data = await response.json();
-        const translation = data.data.text;
+            try {
+                const response = await fetch(apiUrl);
+                const data = await response.json();
 
-        // Updating translation dynamically in the page
-        document.getElementById('english-translation').innerHTML = translation;
-      } catch (error) {
-        console.error('Error fetching translation:', error);
-      }
-    }
+                // Check if the response contains data
+                if (data && data.data) {
+                    // Get the Arabic verse and English translation
+                    const arabicText = data.data.text;
+                    const englishTranslation = data.data.translations[0].text;
 
-    // Call the fetch function on page load
-    window.onload = fetchTranslation;
-  </script>
+                    // Insert the Arabic verse and translation into the HTML
+                    document.getElementById('arabic-verse').innerHTML = arabicText;
+                    document.getElementById('english-translation').innerHTML = englishTranslation;
+                } else {
+                    alert('Verse not found. Please check the verse ID and try again.');
+                }
+            } catch (error) {
+                console.error('Error fetching Quran verse:', error);
+                alert('An error occurred while fetching the verse. Please try again later.');
+            }
+        }
+    </script>
 </body>
 
 </html>
-
-
