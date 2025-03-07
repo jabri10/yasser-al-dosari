@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Music Player with Feedback</title>
+    <title>Advanced Music Player with Feedback</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -11,6 +11,8 @@
             justify-content: center;
             height: 100vh;
             background-color: #f0f0f0;
+            margin: 0;
+            padding: 0;
         }
         #player {
             display: flex;
@@ -21,6 +23,7 @@
             border-radius: 10px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
             margin-bottom: 20px;
+            width: 300px;
         }
         #track-info {
             margin-bottom: 10px;
@@ -31,14 +34,19 @@
             background-color: #ddd;
             margin: 10px 0;
             cursor: pointer;
+            position: relative;
         }
         #progress {
             width: 0;
             height: 100%;
             background-color: #007bff;
         }
-        #volume-control {
-            margin-left: 10px;
+        #controls {
+            display: flex;
+            align-items: center;
+        }
+        #controls button, #volume-control {
+            margin: 0 5px;
         }
         #feedback-form {
             background-color: #fff;
@@ -55,7 +63,7 @@
 <body>
     <div id="player">
         <div id="track-info">
-            <span id="track-title">Yasser Al Dosari Recitations</span> - <span id="track-artist">Yasser Al Dosari</span>
+            <span id="track-title">Track Title</span> - <span id="track-artist">Artist</span>
         </div>
         <audio id="audio" controls>
             <source src="https://qurancentral.com/audio/yasser-al-dossari/001.mp3" type="audio/mpeg">
@@ -67,6 +75,11 @@
             <div id="progress"></div>
         </div>
         <div id="controls">
+            <button onclick="audio.currentTime = 0;">Restart</button>
+            <button onclick="audio.play()">Play</button>
+            <button onclick="audio.pause()">Pause</button>
+            <button onclick="toggleShuffle()">Shuffle</button>
+            <button onclick="toggleRepeat()">Repeat</button>
             <input type="range" id="volume-control" min="0" max="1" step="0.01">
         </div>
     </div>
@@ -116,6 +129,15 @@
         // Update track info (replace with your logic)
         document.getElementById('track-title').textContent = "Yasser Al Dosari Recitations";
         document.getElementById('track-artist').textContent = "Yasser Al Dosari";
+
+        // Shuffle and Repeat functionality (placeholder, needs logic)
+        function toggleShuffle() {
+            console.log('Shuffle toggled');
+        }
+
+        function toggleRepeat() {
+            console.log('Repeat toggled');
+        }
     </script>
 </body>
 </html>
