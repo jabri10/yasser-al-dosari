@@ -13,7 +13,7 @@
             line-height: 1.6;
             margin: 0;
             padding: 0;
-            background-image: url(background-image: url('https://www.example.com/quranic-calligraphy-image.jpg'); 
+            background-image: url('https://i.pinimg.com/originals/82/38/27/823827d0f3952f4c02933990885233e5.jpg'); /* Calligraphy background */
             background-repeat: no-repeat;
             background-size: cover;
             background-position: center center;
@@ -93,21 +93,16 @@
     <div class="container">
         <h1>Quranic Verse Search</h1>
 
-        <!-- Search Bar -->
         <div class="search-bar">
-            <input type="text" id="verse-id" placeholder="Enter verse ID (e.g., 2/255)" />
-            <button onclick="searchVerse()">Search</button>
+            <input type="text" id="verse-id" placeholder="Enter verse (e.g., 2/255)" />
+            <button onclick="fetchVerse()">Search</button>
         </div>
 
-        <!-- Arabic Verse -->
         <div class="arabic-text" id="arabic-verse">
-            <!-- The Arabic text will be inserted here -->
-        </div>
+            </div>
 
-        <!-- English Translation -->
         <div class="verse-translation" id="english-translation">
-            <!-- The English translation will be inserted here -->
-        </div>
+            </div>
 
         <div class="footer">
             <p>&copy; 2025 Quran Inspired. All Rights Reserved.</p>
@@ -115,14 +110,9 @@
     </div>
 
     <script>
-        // Function to fetch the Quranic verse and translation based on search input
-        async function searchVerse() {
-            const verseId = document.getElementById('verse-id').value.trim(); // Get verse ID from search input
-            if (!verseId) {
-                alert('Please enter a verse ID');
-                return;
-            }
-
+        // Function to fetch the Quranic verse and translation
+        async function fetchVerse() {
+            const verseId = document.getElementById('verse-id').value;
             const apiUrl = `https://api.alquran.cloud/v1/ayah/${verseId}/translation/en`;
 
             try {
@@ -139,7 +129,7 @@
                     document.getElementById('arabic-verse').innerHTML = arabicText;
                     document.getElementById('english-translation').innerHTML = englishTranslation;
                 } else {
-                    alert('Verse not found. Please check the verse ID and try again.');
+                    alert('Verse not found. Please enter a valid verse ID.');
                 }
             } catch (error) {
                 console.error('Error fetching Quran verse:', error);
