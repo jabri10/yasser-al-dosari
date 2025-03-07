@@ -48,9 +48,9 @@
             <span id="track-title">Track Title</span> - <span id="track-artist">Artist</span>
         </div>
         <audio id="audio" controls>
-            <source src="audio/your-audio-file1.mp3" type="audio/mpeg">
-            <source src="audio/your-audio-file2.mp3" type="audio/mpeg">
-            <source src="audio/your-audio-file3.mp3" type="audio/mpeg">
+            <source src="https://qurancentral.com/audio/yasser-al-dossari/001.mp3" type="audio/mpeg">
+            <source src="https://surahquran.com/English/Al-Dosari/002.mp3" type="audio/mpeg">
+            <source src="https://www.tvquran.com/en/scholar/94/profile/yasser-al-dosari/003.mp3" type="audio/mpeg">
             Your browser does not support the audio element.
         </audio>
         <div id="progress-bar" onclick="setProgress(event)">
