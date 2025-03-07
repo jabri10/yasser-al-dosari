@@ -1,6 +1,11 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Search for Quran recitations and Islamic lectures videos. Find and watch the best videos on topics related to Quran and Islamic teachings.">
+    <meta name="keywords" content="Quran, Islamic lectures, Quran recitations, Islamic teachings, Islamic videos, Yasser Al Dosari">
+    <meta name="author" content="Your Name">
     <title>Quran and Islamic Lectures Video Search</title>
     <style>
         body {
@@ -26,6 +31,8 @@
             display: flex;
             flex-direction: row;
             align-items: center;
+            width: 100%;
+            max-width: 800px;
         }
         #search-form input {
             flex: 1;
@@ -68,6 +75,14 @@
             max-width: 100%;
             height: 315px;
         }
+        .new-content {
+            background-color: #fff;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 100%;
+        }
     </style>
 </head>
 <body>
@@ -77,12 +92,13 @@
         <button onclick="searchVideos()">Search</button>
     </div>
     <div id="results"></div>
+    <div id="weekly-update"></div>
 
     <script>
         async function searchVideos() {
             const query = document.getElementById('search-query').value + " Quran Islamic lecture";
             const apiKey = 'AIzaSyA9_WsuOaYDxyNtLY2VqcZb1BWvUB_Co0A'; // Your YouTube Data API key
-            const response = await fetch(`https://www.googleapis.com/youtube/v3/search?part=snippet&q=${query}&type=video&key=${apiKey}`);
+            const response = await fetch(`https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(query)}&type=video&key=${apiKey}`);
             const data = await response.json();
             displayResults(data.items);
         }
@@ -100,6 +116,26 @@
                 resultsDiv.appendChild(videoDiv);
             });
         }
+
+        function generateWeeklyContent() {
+            const weeklyContent = `
+                <div class="new-content">
+                    <h2>Weekly Article: Understanding the Beauty of Surah Al-Fatiha</h2>
+                    <p>Surah Al-Fatiha is the opening chapter of the Holy Quran and holds a significant place in Islamic prayers...</p>
+                </div>
+            `;
+            return weeklyContent;
+        }
+
+        function updateContent() {
+            const weeklyUpdateDiv = document.getElementById('weekly-update');
+            const newContent = generateWeeklyContent();
+            weeklyUpdateDiv.innerHTML = newContent;
+        }
+
+        // Automatically update content every week (simulated here)
+        setInterval(updateContent, 604800000); // 604800000 ms = 1 week
+        window.onload = updateContent;
     </script>
 </body>
 </html>
