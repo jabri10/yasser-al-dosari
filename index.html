@@ -1,232 +1,119 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ar">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quran Search - Recitation and Translation</title>
-    <style>
-        body {
-            font-family: 'Arial', sans-serif;
-            background-color: #f4f7f6;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-        }
-        h1 {
-            color: #4CAF50;
-            font-size: 36px;
-            margin-top: 20px;
-        }
-        .search-bar {
-            margin-top: 30px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-        .search-bar input {
-            font-size: 18px;
-            padding: 10px;
-            width: 200px;
-            border: 2px solid #ccc;
-            border-radius: 5px;
-        }
-        .search-bar button {
-            padding: 10px;
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            font-size: 18px;
-            cursor: pointer;
-        }
-        .search-bar button:hover {
-            background-color: #45a049;
-        }
-        .verse-container {
-            text-align: center;
-            margin-top: 20px;
-            max-width: 800px;
-            width: 100%;
-        }
-        .verse-arabic {
-            font-size: 24px;
-            margin-bottom: 10px;
-            color: #333;
-        }
-        .verse-translation {
-            font-size: 18px;
-            margin-bottom: 20px;
-            color: #555;
-        }
-        audio {
-            margin-top: 20px;
-            width: 100%;
-            max-width: 600px;
-        }
-        .loading {
-            font-size: 18px;
-            color: #666;
-            margin-top: 20px;
-        }
-        .verse-item {
-            cursor: pointer;
-            margin-bottom: 10px;
-        }
-        .verse-item:hover {
-            background-color: #f1f1f1;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quran Inspired Page</title>
+  <style>
+    /* Quran Inspired Styles */
+    body {
+      font-family: 'Times New Roman', serif;
+      background-color: #f8f8f0;
+      color: #333;
+      line-height: 1.6;
+      margin: 0;
+      padding: 0;
+      /* Background image with the Quranic verse calligraphy */
+      background-image: url('https://www.freepik.com/premium-vector/islamic-calligraphy-vector-arabic-artwork-vector-calligraphy-quran-qs-al-hijr-15-46_138289469.htm');
+      background-repeat: no-repeat;
+      background-size: cover;
+      background-position: center center;
+    }
+
+    .container {
+      width: 80%;
+      max-width: 1200px;
+      margin: 20px auto;
+      padding: 20px;
+      background-color: rgba(255, 255, 255, 0.8); /* Semi-transparent background for readability */
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    h1,
+    h2,
+    h3 {
+      color: #285943;
+      font-family: 'Georgia', serif;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    a {
+      color: #8b0000;
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    .arabic-text {
+      font-family: 'Scheherazade New', serif;
+      font-size: 2em;
+      line-height: 2;
+      color: #554433;
+      text-align: right;
+      direction: rtl;
+    }
+
+    .verse-translation {
+      font-style: italic;
+      color: #777;
+      text-align: left;
+    }
+
+    .footer {
+      text-align: center;
+      margin-top: 50px;
+      padding: 20px 0;
+      background-color: #f0f0f0;
+      color: #555;
+      border-top: 1px solid #ddd;
+    }
+  </style>
 </head>
+
 <body>
+  <div class="container">
+    <h1>Quranic Verse</h1>
 
-    <h1>Quran Search</h1>
-
-    <div class="search-bar">
-        <input type="text" id="verseNumber" placeholder="Enter verse number or Surah number (e.g. 1:1 or 1)">
-        <button onclick="searchVerse()">Search</button>
+    <!-- Arabic Verse -->
+    <div class="arabic-text" id="arabic-verse">
+      نَّ هَٰذَا الْقُرْآنَ يَهْدِي لِلَّتِي هِيَ أَقْوَمُ وَيُبَشِّرُ الْمُؤْمِنِينَ الَّذِينَ يَعْمَلُونَ الصَّالِحَاتِ أَنَّ لَهُمْ أَجْرًا كَبِيرًا
     </div>
 
-    <div class="verse-container" id="verseContainer">
-        <!-- Verse and translation will be displayed here -->
+    <!-- English Translation -->
+    <div class="verse-translation" id="english-translation">
+      This is the Qur'an, which guides to what is most upright and gives good tidings to the believers who do righteous deeds that they will have a great reward.
     </div>
 
-    <div class="loading" id="loadingMessage" style="display:none;">
-        Loading verse, please wait...
+    <div class="footer">
+      <p>&copy; 2025 Quran Inspired. All Rights Reserved.</p>
     </div>
+  </div>
 
-    <audio id="audioPlayer" controls>
-        <source id="audioSource" src="" type="audio/mp3">
-        Your browser does not support the audio element.
-    </audio>
+  <script>
+    // Fetch translation from an API
+    async function fetchTranslation() {
+      const apiUrl = 'https://api.alquran.cloud/v1/ayah/46/30/translation/en'; // Example API for translations
+      try {
+        const response = await fetch(apiUrl);
+        const data = await response.json();
+        const translation = data.data.text;
 
-    <script>
-        const baseApiUrl = 'https://api.alquran.cloud/v1/';
-        let currentAudio = null; // Keeps track of the current audio playing
+        // Updating translation dynamically in the page
+        document.getElementById('english-translation').innerHTML = translation;
+      } catch (error) {
+        console.error('Error fetching translation:', error);
+      }
+    }
 
-        // Function to search for a specific verse or Surah
-        function searchVerse() {
-            const verseInput = document.getElementById('verseNumber').value.trim();
-            const versePattern = /^(\d+):(\d+)$/;  // Regex for Surah:Ayah format
-            const surahPattern = /^(\d+)$/;  // Regex for just Surah number
-
-            const verseMatch = verseInput.match(versePattern);
-            const surahMatch = verseInput.match(surahPattern);
-
-            if (verseMatch) {
-                // If user enters Surah:Ayah (e.g., 1:1)
-                const surahNumber = verseMatch[1];
-                const ayahNumber = verseMatch[2];
-                fetchVerse(surahNumber, ayahNumber);
-            } else if (surahMatch) {
-                // If user enters only Surah number (e.g., 1)
-                const surahNumber = surahMatch[1];
-                fetchSurah(surahNumber);
-            } else {
-                alert("Please enter a valid Surah:Ayah format (e.g., 1:1) or Surah number (e.g., 1).");
-            }
-        }
-
-        // Function to fetch a specific verse from the API
-        function fetchVerse(surahNumber, ayahNumber) {
-            const url = `${baseApiUrl}ayah/${surahNumber}:${ayahNumber}`;
-            const verseContainer = document.getElementById('verseContainer');
-            const loadingMessage = document.getElementById('loadingMessage');
-
-            // Show loading message
-            loadingMessage.style.display = 'block';
-
-            fetch(url)
-                .then(response => response.json())
-                .then(data => {
-                    loadingMessage.style.display = 'none';
-
-                    if (data.status === 'OK') {
-                        const verseData = data.data;
-
-                        const arabicText = verseData.text;
-                        const translationText = verseData.translation;
-                        const audioUrl = verseData.audioUrl;
-
-                        // Update the UI with the verse and translation
-                        verseContainer.innerHTML = `
-                            <div class="verse-arabic">${arabicText}</div>
-                            <div class="verse-translation">${translationText}</div>
-                            <button onclick="playAudio('${audioUrl}')">Play Audio</button>
-                        `;
-
-                        // Set audio source and play
-                        const audioPlayer = document.getElementById('audioPlayer');
-                        const audioSource = document.getElementById('audioSource');
-                        audioSource.src = audioUrl;
-                        audioPlayer.load();
-                        audioPlayer.play();
-                    } else {
-                        verseContainer.innerHTML = 'Verse not found. Please try again.';
-                    }
-                })
-                .catch(error => {
-                    loadingMessage.style.display = 'none';
-                    console.error('Error fetching verse:', error);
-                    verseContainer.innerHTML = 'An error occurred while fetching the verse.';
-                });
-        }
-
-        // Function to fetch an entire Surah from the API
-        function fetchSurah(surahNumber) {
-            const url = `${baseApiUrl}surah/${surahNumber}`;
-            const verseContainer = document.getElementById('verseContainer');
-            const loadingMessage = document.getElementById('loadingMessage');
-
-            // Show loading message
-            loadingMessage.style.display = 'block';
-
-            fetch(url)
-                .then(response => response.json())
-                .then(data => {
-                    loadingMessage.style.display = 'none';
-
-                    if (data.status === 'OK') {
-                        const surahData = data.data;
-                        const surahName = surahData.name;
-                        const surahVerses = surahData.ayahs;
-
-                        let verseHtml = `<h3>${surahName}</h3>`;
-                        surahVerses.forEach(verse => {
-                            verseHtml += `
-                                <div class="verse-item">
-                                    <div class="verse-arabic">${verse.text}</div>
-                                    <div class="verse-translation">${verse.translation}</div>
-                                    <button onclick="playAudio('${verse.audioUrl}')">Play Audio</button>
-                                </div>
-                            `;
-                        });
-
-                        verseContainer.innerHTML = verseHtml;
-                    } else {
-                        verseContainer.innerHTML = 'Surah not found. Please try again.';
-                    }
-                })
-                .catch(error => {
-                    loadingMessage.style.display = 'none';
-                    console.error('Error fetching surah:', error);
-                    verseContainer.innerHTML = 'An error occurred while fetching the Surah.';
-                });
-        }
-
-        // Play audio for the selected verse
-        function playAudio(audioUrl) {
-            const audioPlayer = document.getElementById('audioPlayer');
-            const audioSource = document.getElementById('audioSource');
-            audioSource.src = audioUrl;
-            audioPlayer.load();
-            audioPlayer.play();
-        }
-    </script>
-
+    // Call the fetch function on page load
+    window.onload = fetchTranslation;
+  </script>
 </body>
+
 </html>
 
 
