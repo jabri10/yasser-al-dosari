@@ -6,47 +6,119 @@
     <title>Quran Player</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Arial', sans-serif;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             height: 100vh;
+            background-image: url('https://example.com/calligraphy-background.jpg'); /* Replace with a real URL */
+            background-size: cover;
+            background-position: center;
+            margin: 0;
+        }
+        .overlay {
+            background: rgba(255, 255, 255, 0.8);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        .overlay h1 {
+            margin-bottom: 20px;
+            font-size: 24px;
+            color: #333333;
+        }
+        .dropdown, .controls {
+            margin-bottom: 10px;
+        }
+        select, button {
+            padding: 10px;
+            margin: 5px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+        select {
+            width: 100%;
+            max-width: 300px;
             background-color: #f0f0f0;
         }
-        .player {
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
         button {
-            margin: 5px;
+            background-color: #0d6efd;
+            color: #ffffff;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0a58ca;
+        }
+        audio {
+            width: 100%;
+            max-width: 300px;
+            margin-top: 10px;
         }
     </style>
 </head>
 <body>
-    <div class="player">
+    <div class="overlay">
         <h1>Quran Player</h1>
-        <select id="surahList">
-            <option value="https://server8.mp3quran.net/afs/001.mp3">Al-Fatiha</option>
-            <option value="https://server8.mp3quran.net/afs/002.mp3">Al-Baqarah</option>
-            <option value="https://server8.mp3quran.net/afs/003.mp3">Al-Imran</option>
-            <!-- Add more surahs here -->
-        </select>
-        <br>
+        <div class="dropdown">
+            <select id="reciterList" onchange="updateSurahList()">
+                <option value="minshawi">Minshawi</option>
+                <option value="al-dosari">Yasser Al Dosari</option>
+                <option value="sudais">Sudais</option>
+            </select>
+            <br>
+            <select id="surahList">
+                <!-- Surah options will be populated based on the selected reciter -->
+            </select>
+        </div>
+        <div class="controls">
+            <button onclick="playSurah()">Play</button>
+            <button onclick="stopSurah()">Stop</button>
+            <button onclick="nextSurah()">Next</button>
+            <button onclick="prevSurah()">Previous</button>
+        </div>
         <audio id="audioPlayer" controls></audio>
-        <br>
-        <button onclick="playSurah()">Play</button>
-        <button onclick="stopSurah()">Stop</button>
-        <button onclick="nextSurah()">Next</button>
-        <button onclick="prevSurah()">Previous</button>
     </div>
 
     <script>
+        const surahUrls = {
+            'minshawi': {
+                'Al-Fatiha': 'https://server10.mp3quran.net/minshawi/001.mp3',
+                'Al-Baqarah': 'https://server10.mp3quran.net/minshawi/002.mp3',
+                'Al-Imran': 'https://server10.mp3quran.net/minshawi/003.mp3'
+                // Add more surahs here
+            },
+            'al-dosari': {
+                'Al-Fatiha': 'https://server12.mp3quran.net/dosari/001.mp3',
+                'Al-Baqarah': 'https://server12.mp3quran.net/dosari/002.mp3',
+                'Al-Imran': 'https://server12.mp3quran.net/dosari/003.mp3'
+                // Add more surahs here
+            },
+            'sudais': {
+                'Al-Fatiha': 'https://server8.mp3quran.net/sds/001.mp3',
+                'Al-Baqarah': 'https://server8.mp3quran.net/sds/002.mp3',
+                'Al-Imran': 'https://server8.mp3quran.net/sds/003.mp3'
+                // Add more surahs here
+            }
+        };
+
+        const reciterList = document.getElementById('reciterList');
         const surahList = document.getElementById('surahList');
         const audioPlayer = document.getElementById('audioPlayer');
         let currentIndex = 0;
+
+        function updateSurahList() {
+            const selectedReciter = reciterList.value;
+            surahList.innerHTML = '';
+            for (const surah in surahUrls[selectedReciter]) {
+                const option = document.createElement('option');
+                option.value = surahUrls[selectedReciter][surah];
+                option.textContent = surah;
+                surahList.appendChild(option);
+            }
+        }
 
         function playSurah() {
             audioPlayer.src = surahList.value;
@@ -69,6 +141,9 @@
             surahList.selectedIndex = currentIndex;
             playSurah();
         }
+
+        // Initialize the surah list with the first reciter's surahs
+        updateSurahList();
     </script>
 </body>
 </html>
