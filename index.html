@@ -3,153 +3,160 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quran Player</title>
+    <title>Quran App</title>
     <style>
         body {
-            font-family: 'Arial', sans-serif;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            background-image: url('https://example.com/calligraphy-background.jpg'); /* Replace with a real URL */
-            background-size: cover;
-            background-position: center;
+            font-family: Arial, sans-serif;
             margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
         }
-        .overlay {
-            background: rgba(255, 255, 255, 0.8);
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        
+        header {
+            background-color: #006400;
+            color: white;
+            padding: 1rem 0;
+        }
+        
+        nav ul {
+            list-style: none;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+        }
+        
+        nav ul li {
+            margin: 0 1rem;
+        }
+        
+        nav ul li a {
+            color: white;
+            text-decoration: none;
+            font-size: 1.2rem;
+        }
+        
+        main {
+            padding: 2rem;
             text-align: center;
         }
-        .overlay h1 {
-            margin-bottom: 20px;
-            font-size: 24px;
-            color: #333333;
+        
+        h1, h2 {
+            color: #006400;
         }
-        .dropdown, .controls {
-            margin-bottom: 10px;
+        
+        #surah-list, #search-results {
+            margin-top: 1rem;
         }
-        select, button {
-            padding: 10px;
-            margin: 5px;
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
-        }
-        select {
+        
+        footer {
+            background-color: #006400;
+            color: white;
+            text-align: center;
+            padding: 1rem 0;
+            position: fixed;
+            bottom: 0;
             width: 100%;
-            max-width: 300px;
-            background-color: #f0f0f0;
-        }
-        button {
-            background-color: #0d6efd;
-            color: #ffffff;
-            cursor: pointer;
-        }
-        button:hover {
-            background-color: #0a58ca;
-        }
-        audio {
-            width: 100%;
-            max-width: 300px;
-            margin-top: 10px;
         }
     </style>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            loadSurahs();
+        });
+
+        async function loadSurahs() {
+            const response = await fetch('https://api.alquran.cloud/v1/surah');
+            const data = await response.json();
+            const surahList = document.getElementById('surah-list');
+
+            data.data.forEach(surah => {
+                const surahDiv = document.createElement('div');
+                surahDiv.classList.add('surah');
+                surahDiv.innerHTML = `
+                    <h3>${surah.englishName} (${surah.name})</h3>
+                    <p>Number of Ayahs: ${surah.numberOfAyahs}</p>
+                    <button onclick="loadSurah(${surah.number})">Read Surah</button>
+                `;
+                surahList.appendChild(surahDiv);
+            });
+        }
+
+        async function loadSurah(surahNumber) {
+            const response = await fetch(`https://api.alquran.cloud/v1/surah/${surahNumber}`);
+            const data = await response.json();
+            const surahList = document.getElementById('surah-list');
+            surahList.innerHTML = '';  // Clear previous content
+
+            const surah = data.data;
+            const surahDiv = document.createElement('div');
+            surahDiv.classList.add('surah');
+            surahDiv.innerHTML = `
+                <h3>${surah.englishName} (${surah.name})</h3>
+                <p><strong>Revelation Type:</strong> ${surah.revelationType}</p>
+                <div id="ayahs">
+                    ${surah.ayahs.map(ayah => `<p><strong>${ayah.numberInSurah}</strong>: ${ayah.text}</p>`).join('')}
+                </div>
+                <button onclick="loadSurahs()">Back to Surahs</button>
+            `;
+            surahList.appendChild(surahDiv);
+        }
+
+        async function searchQuran() {
+            const query = document.getElementById('search-input').value;
+            const response = await fetch(`https://api.alquran.cloud/v1/search/${query}/all/en`);
+            const data = await response.json();
+            const searchResults = document.getElementById('search-results');
+            searchResults.innerHTML = '';  // Clear previous results
+
+            if (data.data.matches.length === 0) {
+                searchResults.innerHTML = '<p>No results found</p>';
+                return;
+            }
+
+            data.data.matches.forEach(match => {
+                const resultDiv = document.createElement('div');
+                resultDiv.classList.add('result');
+                resultDiv.innerHTML = `
+                    <p><strong>Surah ${match.surah.number} (${match.surah.englishName}) Ayah ${match.numberInSurah}</strong>: ${match.text}</p>
+                `;
+                searchResults.appendChild(resultDiv);
+            });
+        }
+    </script>
 </head>
 <body>
-    <div class="overlay">
-        <h1>Quran Player</h1>
-        <div class="dropdown">
-            <select id="reciterList" onchange="updateSurahList()">
-                <option value="minshawi">Minshawi</option>
-                <option value="al-dosari">Yasser Al Dosari</option>
-                <option value="sudais">Sudais</option>
-            </select>
-            <br>
-            <select id="surahList">
-                <!-- Surah options will be populated based on the selected reciter -->
-            </select>
-        </div>
-        <div class="controls">
-            <button id="playButton" onclick="playSurah()">Play</button>
-            <button id="stopButton" onclick="stopSurah()">Stop</button>
-            <button id="nextButton" onclick="nextSurah()">Next</button>
-            <button id="prevButton" onclick="prevSurah()">Previous</button>
-        </div>
-        <audio id="audioPlayer" controls></audio>
-    </div>
-
-    <script>
-        const surahUrls = {
-            'minshawi': {
-                'Al-Fatiha': 'https://server10.mp3quran.net/minshawi/001.mp3',
-                'Al-Baqarah': 'https://server10.mp3quran.net/minshawi/002.mp3',
-                'Al-Imran': 'https://server10.mp3quran.net/minshawi/003.mp3'
-                // Add more surahs here
-            },
-            'al-dosari': {
-                'Al-Fatiha': 'https://server12.mp3quran.net/dosari/001.mp3',
-                'Al-Baqarah': 'https://server12.mp3quran.net/dosari/002.mp3',
-                'Al-Imran': 'https://server12.mp3quran.net/dosari/003.mp3'
-                // Add more surahs here
-            },
-            'sudais': {
-                'Al-Fatiha': 'https://server8.mp3quran.net/sds/001.mp3',
-                'Al-Baqarah': 'https://server8.mp3quran.net/sds/002.mp3',
-                'Al-Imran': 'https://server8.mp3quran.net/sds/003.mp3'
-                // Add more surahs here
-            }
-        };
-
-        const reciterList = document.getElementById('reciterList');
-        const surahList = document.getElementById('surahList');
-        const audioPlayer = document.getElementById('audioPlayer');
-        let currentIndex = 0;
-
-        function updateSurahList() {
-            const selectedReciter = reciterList.value;
-            surahList.innerHTML = '';
-            for (const surah in surahUrls[selectedReciter]) {
-                const option = document.createElement('option');
-                option.value = surahUrls[selectedReciter][surah];
-                option.textContent = surah;
-                surahList.appendChild(option);
-            }
-            currentIndex = 0;
-            surahList.selectedIndex = currentIndex;
-        }
-
-        function playSurah() {
-            if (surahList.value) {
-                audioPlayer.src = surahList.value;
-                audioPlayer.play();
-            } else {
-                alert("Please select a Surah to play.");
-            }
-        }
-
-        function stopSurah() {
-            audioPlayer.pause();
-            audioPlayer.currentTime = 0;
-        }
-
-        function nextSurah() {
-            currentIndex = (currentIndex + 1) % surahList.options.length;
-            surahList.selectedIndex = currentIndex;
-            playSurah();
-        }
-
-        function prevSurah() {
-            currentIndex = (currentIndex - 1 + surahList.options.length) % surahList.options.length;
-            surahList.selectedIndex = currentIndex;
-            playSurah();
-        }
-
-        // Initialize the surah list with the first reciter's surahs
-        updateSurahList();
-    </script>
+    <header>
+        <nav>
+            <ul>
+                <li><a href="#home">Home</a></li>
+                <li><a href="#surahs">Surahs</a></li>
+                <li><a href="#search">Search</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <section id="home">
+            <h1>Welcome to the Quran App</h1>
+            <p>Read, search, and explore the Quran.</p>
+        </section>
+        
+        <section id="surahs">
+            <h2>Surahs</h2>
+            <div id="surah-list">
+                <!-- Surahs will be dynamically loaded here -->
+            </div>
+        </section>
+        
+        <section id="search">
+            <h2>Search the Quran</h2>
+            <input type="text" id="search-input" placeholder="Enter a keyword or Ayah number">
+            <button onclick="searchQuran()">Search</button>
+            <div id="search-results">
+                <!-- Search results will be displayed here -->
+            </div>
+        </section>
+    </main>
+    <footer>
+        <p>&copy; 2025 Quran App. All rights reserved.</p>
+    </footer>
 </body>
 </html>
