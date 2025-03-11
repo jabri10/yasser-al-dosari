@@ -3,10 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Search for Quran recitations and Islamic lectures videos. Find and watch the best videos on topics related to Quran and Islamic teachings.">
-    <meta name="keywords" content="Quran, Islamic lectures, Quran recitations, Islamic teachings, Islamic videos, Yasser Al Dosari">
-    <meta name="author" content="Your Name">
-    <title>Quran and Islamic Lectures Video Search</title>
+    <title>Quran Player</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -14,128 +11,64 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            min-height: 100vh;
-            background-color: #f7f7f7;
-            margin: 0;
+            height: 100vh;
+            background-color: #f0f0f0;
+        }
+        .player {
+            background: white;
             padding: 20px;
-            background: url('https://www.transparenttextures.com/patterns/arabic.png');
-            background-blend-mode: multiply;
-            background-size: cover;
-        }
-        h1 {
-            color: #4a2c2a;
-            text-shadow: 2px 2px 2px #fff;
-        }
-        #search-form {
-            margin-bottom: 20px;
-            display: flex;
-            flex-direction: row;
-            align-items: center;
-            width: 100%;
-            max-width: 800px;
-        }
-        #search-form input {
-            flex: 1;
-            padding: 10px;
-            border-radius: 5px;
-            border: 1px solid #ccc;
-            font-size: 16px;
-        }
-        #search-form button {
-            background-color: #4a2c2a;
-            color: #fff;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
-            font-size: 16px;
-            cursor: pointer;
-            margin-left: 10px;
-        }
-        #search-form button:hover {
-            background-color: #5c3c3a;
-        }
-        #results {
-            width: 100%;
-            max-width: 800px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-        .video {
-            margin-bottom: 20px;
-            width: 100%;
-        }
-        .video h3 {
-            color: #4a2c2a;
-            font-size: 1.2em;
-            margin-bottom: 10px;
-        }
-        iframe {
-            width: 100%;
-            max-width: 100%;
-            height: 315px;
-        }
-        .new-content {
-            background-color: #fff;
             border-radius: 10px;
-            padding: 20px;
-            margin-top: 20px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            width: 100%;
+        }
+        button {
+            margin: 5px;
         }
     </style>
 </head>
 <body>
-    <h1>Quran and Islamic Lectures Video Search</h1>
-    <div id="search-form">
-        <input type="text" id="search-query" placeholder="Enter Video Name">
-        <button onclick="searchVideos()">Search</button>
+    <div class="player">
+        <h1>Quran Player</h1>
+        <select id="surahList">
+            <option value="https://server8.mp3quran.net/afs/001.mp3">Al-Fatiha</option>
+            <option value="https://server8.mp3quran.net/afs/002.mp3">Al-Baqarah</option>
+            <option value="https://server8.mp3quran.net/afs/003.mp3">Al-Imran</option>
+            <!-- Add more surahs here -->
+        </select>
+        <br>
+        <audio id="audioPlayer" controls></audio>
+        <br>
+        <button onclick="playSurah()">Play</button>
+        <button onclick="stopSurah()">Stop</button>
+        <button onclick="nextSurah()">Next</button>
+        <button onclick="prevSurah()">Previous</button>
     </div>
-    <div id="results"></div>
-    <div id="weekly-update"></div>
 
     <script>
-        async function searchVideos() {
-            const query = document.getElementById('search-query').value + " Quran Islamic lecture";
-            const apiKey = 'AIzaSyA9_WsuOaYDxyNtLY2VqcZb1BWvUB_Co0A'; // Your YouTube Data API key
-            const response = await fetch(`https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(query)}&type=video&key=${apiKey}`);
-            const data = await response.json();
-            displayResults(data.items);
+        const surahList = document.getElementById('surahList');
+        const audioPlayer = document.getElementById('audioPlayer');
+        let currentIndex = 0;
+
+        function playSurah() {
+            audioPlayer.src = surahList.value;
+            audioPlayer.play();
         }
 
-        function displayResults(videos) {
-            const resultsDiv = document.getElementById('results');
-            resultsDiv.innerHTML = '';
-            videos.forEach(video => {
-                const videoDiv = document.createElement('div');
-                videoDiv.className = 'video';
-                videoDiv.innerHTML = `
-                    <h3>${video.snippet.title}</h3>
-                    <iframe src="https://www.youtube.com/embed/${video.id.videoId}" frameborder="0" allowfullscreen></iframe>
-                `;
-                resultsDiv.appendChild(videoDiv);
-            });
+        function stopSurah() {
+            audioPlayer.pause();
+            audioPlayer.currentTime = 0;
         }
 
-        function generateWeeklyContent() {
-            const weeklyContent = `
-                <div class="new-content">
-                    <h2>Weekly Article: Understanding the Beauty of Surah Al-Fatiha</h2>
-                    <p>Surah Al-Fatiha is the opening chapter of the Holy Quran and holds a significant place in Islamic prayers...</p>
-                </div>
-            `;
-            return weeklyContent;
+        function nextSurah() {
+            currentIndex = (currentIndex + 1) % surahList.options.length;
+            surahList.selectedIndex = currentIndex;
+            playSurah();
         }
 
-        function updateContent() {
-            const weeklyUpdateDiv = document.getElementById('weekly-update');
-            const newContent = generateWeeklyContent();
-            weeklyUpdateDiv.innerHTML = newContent;
+        function prevSurah() {
+            currentIndex = (currentIndex - 1 + surahList.options.length) % surahList.options.length;
+            surahList.selectedIndex = currentIndex;
+            playSurah();
         }
-
-        // Automatically update content every week (simulated here)
-        setInterval(updateContent, 604800000); // 604800000 ms = 1 week
-        window.onload = updateContent;
     </script>
 </body>
 </html>
