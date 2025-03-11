@@ -74,10 +74,10 @@
             </select>
         </div>
         <div class="controls">
-            <button onclick="playSurah()">Play</button>
-            <button onclick="stopSurah()">Stop</button>
-            <button onclick="nextSurah()">Next</button>
-            <button onclick="prevSurah()">Previous</button>
+            <button id="playButton" onclick="playSurah()">Play</button>
+            <button id="stopButton" onclick="stopSurah()">Stop</button>
+            <button id="nextButton" onclick="nextSurah()">Next</button>
+            <button id="prevButton" onclick="prevSurah()">Previous</button>
         </div>
         <audio id="audioPlayer" controls></audio>
     </div>
@@ -118,11 +118,17 @@
                 option.textContent = surah;
                 surahList.appendChild(option);
             }
+            currentIndex = 0;
+            surahList.selectedIndex = currentIndex;
         }
 
         function playSurah() {
-            audioPlayer.src = surahList.value;
-            audioPlayer.play();
+            if (surahList.value) {
+                audioPlayer.src = surahList.value;
+                audioPlayer.play();
+            } else {
+                alert("Please select a Surah to play.");
+            }
         }
 
         function stopSurah() {
