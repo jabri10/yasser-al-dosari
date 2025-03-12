@@ -1,6 +1,5 @@
 import ddf.minim.*;
-
-Minim minim;
+ minim;
 AudioPlayer player;
 
 float x;
